@@ -1,4 +1,5 @@
 
+//inicio del programa
 static const char *nombreClase="VelocidadHDD";
 
 static Ventana *pVentana;

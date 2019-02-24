@@ -1,5 +1,6 @@
 #include "Ventana.h"
 
+//crea una tabla de windows
 class Tabla:public Ventana{
 	private:
 		

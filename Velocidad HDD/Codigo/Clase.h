@@ -1,3 +1,5 @@
+
+//crea una clase de windows
 class Clase{
 	private:
 		LPCTSTR hClase;

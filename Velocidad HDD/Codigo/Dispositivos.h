@@ -1,6 +1,7 @@
 #include "Tabla.h"
 #include "Medicion.h"
 
+//controlador de la tabla de windows
 class Dispositivos{
 	private:
 		Medicion *aMedicion;

@@ -1,5 +1,6 @@
 #include <windows.h>
 
+//crea una ventana de windows
 class Ventana{
 	protected:
 		HWND hVentana;

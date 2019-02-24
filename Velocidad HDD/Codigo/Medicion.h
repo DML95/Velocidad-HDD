@@ -1,5 +1,6 @@
 #include "Unidad.h"
 
+//crea una operacion de medicion de un dispositivo
 class Medicion{
 	private:
 		bool finHilo;
@@ -19,16 +20,21 @@ class Medicion{
 		//Destructor
 		~Medicion();
 		
-		//Getter y setter
+		//inicia la medicion
 		void iniciar();
 		
+		//detiene la medicion
 		void detener();
 		
+		//optiene el dispositivo
 		char getDispositivo();
 		
+		//opetiene las operaciones y errores y reinicia el contador
 		int getOperaciones(int *error);
 		
+		//optiene el tamaño del sector de la unidad medida
 		int getByteSector();
 		
+		//establece el dispositivo
 		void setDispositivo(char dispositivo);
 };

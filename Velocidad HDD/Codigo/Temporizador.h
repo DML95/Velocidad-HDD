@@ -1,3 +1,5 @@
+
+//crea eventos de temporizacion enviados a una ventana de windows
 class Temporizador{
 	private:
 		UINT_PTR hTemporizador;

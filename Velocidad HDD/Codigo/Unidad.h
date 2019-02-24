@@ -1,3 +1,5 @@
+
+//abre una unidad y devuelve y lee sus datos
 class Unidad{
 	private:
 		HANDLE hUnidad;
