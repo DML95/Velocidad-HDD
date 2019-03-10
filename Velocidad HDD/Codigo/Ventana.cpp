@@ -101,7 +101,7 @@ void Ventana::setPadre(HWND hVentana){
 //getter setter color
 void Ventana::setColor(int color){
 	color&=0xffffff;
-	SetClassLong(this->hVentana,GCL_HBRBACKGROUND,(int)CreateSolidBrush(color));
+	SetClassLongPtr(this->hVentana,GCLP_HBRBACKGROUND,(long long)CreateSolidBrush(color));
 }
 
 //Repinta la ventana

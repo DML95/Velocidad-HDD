@@ -7,7 +7,7 @@ int Medicion::hilo(Medicion *medicion){
 	long long sectorAleatorio,numSectores;
 	int tamanoSector=medicion->unidad->getByteSector();
 	char buffer[2*tamanoSector-1];
-	char *bufferAlineado=(char*)((int)(buffer+tamanoSector-1)&~(tamanoSector-1));
+	char *bufferAlineado=(char*)((long long)(buffer+tamanoSector-1)&~(tamanoSector-1));
 	medicion->unidad->getNumSector(&numSectores);
 	while(medicion->finHilo){
 		longLongAleatorio(&sectorAleatorio,numSectores);

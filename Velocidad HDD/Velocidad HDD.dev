@@ -27,8 +27,8 @@ CommandLine=
 Folders=Cabeceras,Codigo
 IncludeVersionInfo=0
 SupportXPThemes=0
-CompilerSet=3
-CompilerSettings=000000a1g0100000000000001
+CompilerSet=0
+CompilerSettings=000000aac0000000000000000
 UnitCount=18
 
 [VersionInfo]
