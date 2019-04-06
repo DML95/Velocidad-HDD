@@ -1,4 +1,5 @@
 #include <windows.h>
+#include<string>
 
 //crea una ventana de windows
 class Ventana{
@@ -42,7 +43,7 @@ class Ventana{
 		void setPosicion(int x,int y);
 		
 		//Getter setter texto
-		void setTexto(const char *texto);
+		void setTexto(std::string texto);
 		
 		//Getter setter Padre
 		void setPadre(Ventana *padre);

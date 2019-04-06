@@ -1,10 +1,12 @@
+#include <atomic>
+
 #include "Unidad.h"
 
 //crea una operacion de medicion de un dispositivo
 class Medicion{
 	private:
 		bool finHilo;
-		int operaciones,error;
+		std::atomic_int operaciones,error;
 		char dispositivo;
 		Unidad *unidad;
 		HANDLE hHilo;

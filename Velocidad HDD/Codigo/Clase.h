@@ -1,3 +1,4 @@
+#include <string>
 
 //crea una clase de windows
 class Clase{
@@ -5,7 +6,7 @@ class Clase{
 		LPCTSTR hClase;
 	public:
 		//Constructor
-		Clase(char *nombre,const WNDPROC proc);
+		Clase(std::string nombre,const WNDPROC proc);
 		//Destructor
 		~Clase();
 		//LPCTSTR

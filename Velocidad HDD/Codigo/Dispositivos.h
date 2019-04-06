@@ -8,7 +8,7 @@ class Dispositivos{
 		Tabla *tabla;
 		int dispositivos;
 		
-		void mostrarBytesSegundo(char *valor,float bytes);
+		std::string mostrarBytesSegundo(float bytes);
 		
 		void agregarColumnas();
 		

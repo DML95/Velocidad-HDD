@@ -1,8 +1,10 @@
 #include <windows.h>
+#include<iostream>
 
 #include "Unidad.h"
 
 Unidad::Unidad(char unidad){
+	std::clog<<"[Unidad] iniciando unidad: "<<unidad<<std::endl;
 	int tam;
 	DISK_GEOMETRY disco;
 	char nombreUnidad[]="\\\\.\\ :";
@@ -26,10 +28,13 @@ Unidad::Unidad(char unidad){
 			throw (int)GetLastError();
 		}
 	}
+	std::clog<<"[Unidad] unidad info\n\tbytes por sector: "<<this->byteSector<<
+			"\n\tnumero de sectores: "<<this->numSector<<std::endl;
 }
 
 //Destructor
 Unidad::~Unidad(){
+	std::clog<<"[Unidad] eliminado unidad"<<std::endl;
 	CloseHandle(this->hUnidad);
 }
 
@@ -43,7 +48,7 @@ void Unidad::getNumSector(long long *numSector){
 }
 
 bool Unidad::getRegistro(char *datos,long long numSector){
-	int tam,*registro=(int*)&numSector;
+	long long tam,*registro=(long long*)&numSector;
 	bool salida=SetFilePointer(this->hUnidad,(LONG)*registro,(PLONG)*(registro+1),FILE_BEGIN);
 	if(salida)salida=ReadFile(this->hUnidad,datos,this->byteSector,(LPDWORD)&tam,0);
 	return salida;

@@ -1,3 +1,5 @@
+#include<string>
+
 #include "Ventana.h"
 
 //crea una tabla de windows
@@ -10,7 +12,7 @@ class Tabla:public Ventana{
 		Tabla(HWND padre);
 		
 		//Columnas
-		void agregarColumna(char *texto,int anchuraPx,int posicion);
+		void agregarColumna(std::string texto,int anchuraPx,int posicion);
 		
 		//Filas
 		void agregarFilas(int numFilas,int posicion);
@@ -19,9 +21,9 @@ class Tabla:public Ventana{
 		
 		int getNumFilas();
 		//Celdas
-		void setValor(char *texto,int fila,int columna);
+		void setValor(std::string texto,int fila,int columna);
 		
-		int getValor(char *texto,int tamano,int fila,int columna);
+		std::string getValor(int fila,int columna);
 		//checkbox
 		void setChecked(int fila,bool checked);
 		//Estilo
