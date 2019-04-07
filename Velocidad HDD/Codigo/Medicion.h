@@ -5,7 +5,7 @@
 //crea una operacion de medicion de un dispositivo
 class Medicion{
 	private:
-		bool finHilo;
+		std::atomic_bool finHilo;
 		std::atomic_int operaciones,error;
 		char dispositivo;
 		Unidad *unidad;

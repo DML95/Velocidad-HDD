@@ -62,7 +62,7 @@ void Medicion::iniciar(){
 void Medicion::detener(){
 	std::clog<<"[Medicion] detener medicion dispositivo: "<<this->dispositivo<<std::endl;
 	if(this->hHilo){
-		this->finHilo=false;
+		this->finHilo.exchange(false);
 		this->unidad->cancelarOperacion();
 		WaitForSingleObject(this->hHilo,INFINITE);
 		CloseHandle(this->hHilo);
