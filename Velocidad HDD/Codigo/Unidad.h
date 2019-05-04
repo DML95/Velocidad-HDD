@@ -16,7 +16,7 @@ class Unidad{
 		//getter Setter
 		int getByteSector();
 		
-		void getNumSector(long long *numSector);
+		long long getNumSector();
 		
 		bool getRegistro(char *datos,long long numSector);
 		

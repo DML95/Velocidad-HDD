@@ -5,14 +5,12 @@
 
 int Medicion::hilo(Medicion *medicion){
 	std::clog<<"[Medicion] iniciando hilo unidad: "<<medicion->getDispositivo()<<std::endl;
-	long long sectorAleatorio,numSectores;
 	int tamanoSector=medicion->unidad->getByteSector();
 	char buffer[2*tamanoSector-1];
 	char *bufferAlineado=(char*)((long long)(buffer+tamanoSector-1)&~(tamanoSector-1));
-	medicion->unidad->getNumSector(&numSectores);
+	long long numSectores=medicion->unidad->getNumSector();
 	while(medicion->finHilo){
-		longLongAleatorio(&sectorAleatorio,numSectores);
-		if(medicion->unidad->getRegistro(bufferAlineado,sectorAleatorio)){
+		if(medicion->unidad->getRegistro(bufferAlineado,longLongAleatorio(numSectores))){
 			medicion->operaciones.fetch_add(1);
 		}else medicion->error.fetch_add(1);
 	}
@@ -20,13 +18,13 @@ int Medicion::hilo(Medicion *medicion){
 	return 0;
 }
 
-void Medicion::longLongAleatorio(long long *valor,long long maximo){
-	int cont;
-	short *subValor=(short*)valor;
-	for(cont=0;cont<4;cont++){
-		subValor[cont]=(short)std::rand();
+long long Medicion::longLongAleatorio(long long maximo){
+	long long out;
+	for(int cont=0;cont<4;cont++){
+		out|=std::rand();
+		out<<=16;
 	}
-	*valor%=maximo;
+	return out%maximo;
 }
 
 //Constructor
@@ -48,11 +46,9 @@ Medicion::~Medicion(){
 //Getter y setter
 void Medicion::iniciar(){
 	std::clog<<"[Medicion] iniciando medicion dispositivo: "<<this->dispositivo<<std::endl;
-	long long numSector;
 	if(!this->hHilo){
 		this->finHilo=true;
 		this->unidad=new Unidad(this->dispositivo);
-		this->unidad->getNumSector(&numSector);
 		this->hHilo=CreateThread(0,0,(LPTHREAD_START_ROUTINE)hilo,this,0,0);
 		this->operaciones=0;
 		this->error=0;

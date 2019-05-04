@@ -43,8 +43,8 @@ int Unidad::getByteSector(){
 	return this->byteSector;
 }
 
-void Unidad::getNumSector(long long *numSector){
-	*numSector=this->numSector;
+long long Unidad::getNumSector(){
+	return this->numSector;
 }
 
 bool Unidad::getRegistro(char *datos,long long numSector){

@@ -13,7 +13,7 @@ class Medicion{
 		
 		static int hilo(Medicion *medicion);
 		
-		static void longLongAleatorio(long long *valor,long long maximo);
+		static long long longLongAleatorio(long long maximo);
 		
 	public:
 		//Constructor
