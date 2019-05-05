@@ -25,7 +25,7 @@ std::string Dispositivos::mostrarBytesSegundo(float bytes){
 void Dispositivos::agregarColumnas(){
 	this->tabla->agregarColumna("Unidad",60,COLUMNA_UNIDAD);
 	this->tabla->agregarColumna("Bytes/segundo",110,COLUMNA_BYTES_SEGUNDO);
-	this->tabla->agregarColumna("Sectores/segundo",130,COLUMNA_SECTORES_SEGUNDO);
+	this->tabla->agregarColumna("IOPS",130,COLUMNA_SECTORES_SEGUNDO);
 	this->tabla->agregarColumna("Porcentaje de errores",150,COLUMNA_PORCENTAJE_ERRORES);
 	this->tabla->agregarColumna("Error",200,COLUMNA_ERROR);
 }
@@ -146,12 +146,9 @@ void Dispositivos::mostrarMedicion(){
 			if(this->aMedicion[cont].getDispositivo()==unidad){
 				operaciones=this->aMedicion[cont].getOperaciones(&error);
 				if(operaciones>=0){
-					std::stringstream stream;
-					stream<<operaciones<<" S/s";
-					this->tabla->setValor(stream.str(),fila,COLUMNA_SECTORES_SEGUNDO);
+					this->tabla->setValor(std::to_string(operaciones),fila,COLUMNA_SECTORES_SEGUNDO);
 					this->tabla->setValor(mostrarBytesSegundo(this->aMedicion[cont].getByteSector()*operaciones),fila,COLUMNA_BYTES_SEGUNDO);
-					stream.str(std::string());
-    				stream.clear();
+					std::stringstream stream;
 					stream<<std::setprecision(2)<<((error+operaciones)?(float)error*100./(error+operaciones):0.)<<" %";
 					this->tabla->setValor(stream.str(),fila,COLUMNA_PORCENTAJE_ERRORES);
 				}
