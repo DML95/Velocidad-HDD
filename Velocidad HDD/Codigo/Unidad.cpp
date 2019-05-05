@@ -48,8 +48,9 @@ long long Unidad::getNumSector(){
 }
 
 bool Unidad::getRegistro(char *datos,long long numSector){
-	long long tam,*registro=(long long*)&numSector;
-	bool salida=SetFilePointer(this->hUnidad,(LONG)*registro,(PLONG)*(registro+1),FILE_BEGIN);
+	long long tam;
+	LARGE_INTEGER position={numSector*this->byteSector};
+	bool salida=SetFilePointerEx(this->hUnidad,position,NULL,FILE_BEGIN);
 	if(salida)salida=ReadFile(this->hUnidad,datos,this->byteSector,(LPDWORD)&tam,0);
 	return salida;
 }
