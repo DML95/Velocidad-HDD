@@ -40,7 +40,6 @@ int Medicion::hilo(Medicion *medicion){
 			medicion->unidad->getRegistro(bufferAlineado,overlapped);
 		}else medicion->error.fetch_add(1);
 	}
-	medicion->unidad->cancelarOperacion();
 	WaitForMultipleObjects(listEvent.capacity(),listEvent.data(),true,INFINITE);
 	//cerramos los la lista de eventos
 	for(int cont=0;cont<size;++cont){
@@ -91,6 +90,7 @@ void Medicion::detener(){
 	std::clog<<"[Medicion] detener medicion dispositivo: "<<this->dispositivo<<std::endl;
 	if(this->hHilo){
 		this->finHilo.exchange(false);
+		this->unidad->cancelarOperacion();
 		WaitForSingleObject(this->hHilo,INFINITE);
 		CloseHandle(this->hHilo);
 		delete this->unidad;
