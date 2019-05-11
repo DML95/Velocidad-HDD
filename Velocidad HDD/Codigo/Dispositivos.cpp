@@ -114,7 +114,14 @@ void Dispositivos::iniciar(int fila){
 				this->tabla->setValor("",fila,COLUMNA_ERROR);
 			}catch(int e){
        			this->tabla->setChecked(fila,false);
-       			this->tabla->setValor("Error al iniciar la unidad",fila,COLUMNA_ERROR);
+       			std::clog<<"[Dispositivos] TEST: "<<e<<std::endl;
+       			std::string mensajeError="Error al iniciar la unidad";
+       			switch(e){
+					case ERROR_ACCESS_DENIED:
+						mensajeError="Acceso denegado";
+						break;
+       			}
+       			this->tabla->setValor(mensajeError,fila,COLUMNA_ERROR);
 			}
 			salir=false;
 		}

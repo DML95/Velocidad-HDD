@@ -15,7 +15,7 @@ Unidad::Unidad(char unidad){
 			FILE_SHARE_READ|FILE_SHARE_WRITE,
 			0,
 			OPEN_EXISTING,
-			FILE_ATTRIBUTE_NORMAL|FILE_FLAG_NO_BUFFERING,
+			FILE_ATTRIBUTE_NORMAL|FILE_FLAG_NO_BUFFERING|FILE_FLAG_OVERLAPPED,
 			0);
 	if(this->hUnidad==INVALID_HANDLE_VALUE){
 		throw (int)GetLastError();
@@ -39,6 +39,10 @@ Unidad::~Unidad(){
 }
 
 //getter Setter
+HANDLE Unidad::get(){
+	return this->hUnidad;
+}
+
 int Unidad::getByteSector(){
 	return this->byteSector;
 }
@@ -47,14 +51,12 @@ long long Unidad::getNumSector(){
 	return this->numSector;
 }
 
-bool Unidad::getRegistro(char *datos,long long numSector){
-	long long tam;
-	LARGE_INTEGER position={numSector*this->byteSector};
-	bool salida=SetFilePointerEx(this->hUnidad,position,NULL,FILE_BEGIN);
-	if(salida)salida=ReadFile(this->hUnidad,datos,this->byteSector,(LPDWORD)&tam,0);
-	return salida;
+bool Unidad::getRegistro(const char *datos,OVERLAPPED *overlapped){
+	return ReadFile(this->hUnidad,(LPVOID)datos,this->byteSector,NULL,overlapped);
 }
 
 void Unidad::cancelarOperacion(){
 	CancelIo(this->hUnidad);
 }
+
+

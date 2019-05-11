@@ -1,5 +1,5 @@
 
-//abre una unidad y devuelve y lee sus datos
+//abre una unidad y devuelve y lee sus datos de manera asincrona
 class Unidad{
 	private:
 		HANDLE hUnidad;
@@ -14,11 +14,13 @@ class Unidad{
 		~Unidad();
 		
 		//getter Setter
+		HANDLE get();
+		
 		int getByteSector();
 		
 		long long getNumSector();
 		
-		bool getRegistro(char *datos,long long numSector);
+		bool getRegistro(const char *datos,OVERLAPPED *overlapped);
 		
 		void cancelarOperacion();
 };
