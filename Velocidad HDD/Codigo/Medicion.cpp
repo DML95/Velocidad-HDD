@@ -79,7 +79,7 @@ void Medicion::iniciar(){
 	std::clog<<"[Medicion] iniciando medicion dispositivo: "<<this->dispositivo<<std::endl;
 	if(!this->hHilo){
 		this->finHilo=true;
-		this->unidad=new Unidad(this->dispositivo);
+		this->unidad.reset(new Unidad(this->dispositivo));
 		this->hHilo=CreateThread(0,0,(LPTHREAD_START_ROUTINE)hilo,this,0,0);
 		this->operaciones=0;
 		this->error=0;
@@ -93,7 +93,7 @@ void Medicion::detener(){
 		this->unidad->cancelarOperacion();
 		WaitForSingleObject(this->hHilo,INFINITE);
 		CloseHandle(this->hHilo);
-		delete this->unidad;
+		this->unidad.reset();
 		this->unidad=0;
 		this->hHilo=0;
 		this->operaciones=-1;

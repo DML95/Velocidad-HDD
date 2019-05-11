@@ -40,8 +40,8 @@ void Dispositivos::agregarDispositivo(char dispositivo,int posicion){
 	this->tabla->agregarFilas(1,posicion);
 	this->tabla->setValor(unidad,posicion,COLUMNA_UNIDAD);
 	for(cont=0;cont<'Z'-'A'&&salir;cont++){
-		if(!this->aMedicion[cont].getDispositivo()){
-			this->aMedicion[cont].setDispositivo(dispositivo);
+		if(!this->listMedicion[cont].getDispositivo()){
+			this->listMedicion[cont].setDispositivo(dispositivo);
 			salir=false;
 		}
 	}
@@ -53,8 +53,8 @@ void Dispositivos::eliminarDispositivo(int dispositivo,int posicion){
 	int cont;
 	this->tabla->eliminarFilas(1,posicion);
 	for(cont=0;cont<'Z'-'A';cont++){
-		if(this->aMedicion[cont].getDispositivo()==dispositivo){
-			this->aMedicion[cont].setDispositivo(0);
+		if(this->listMedicion[cont].getDispositivo()==dispositivo){
+			this->listMedicion[cont].setDispositivo(0);
 		}
 	}
 }
@@ -65,18 +65,17 @@ char Dispositivos::getUnidad(int fila){
 }
 
 //Constructor
-Dispositivos::Dispositivos(Tabla *tabla){
+Dispositivos::Dispositivos(std::shared_ptr<Tabla> &tabla):
+			tabla(tabla),
+			listMedicion('Z'-'A'){
 	std::clog<<"[Dispositivos] creando dispositivo"<<std::endl;
-	this->tabla=tabla;
 	agregarColumnas();
-	this->aMedicion=new Medicion['Z'-'A'];
 	dispositivos=0;
 }
 
 //Destructor
 Dispositivos::~Dispositivos(){
 	std::clog<<"[Dispositivos] destruyendo dispositivo"<<std::endl;
-	delete[] this->aMedicion;
 }
 
 //Actualiza la tabla
@@ -106,11 +105,11 @@ void Dispositivos::iniciar(int fila){
 	std::clog<<"[Dispositivos] iniciar fila: "<<fila<<std::endl;
 	bool salir=true;
 	int cont;
-	char unidad=getUnidad(fila);
+	char unidad=this->getUnidad(fila);
 	for(cont=0;cont<'Z'-'A'&&salir&&unidad;cont++){
-		if(this->aMedicion[cont].getDispositivo()==unidad){
+		if(this->listMedicion[cont].getDispositivo()==unidad){
 			try{
-				this->aMedicion[cont].iniciar();
+				this->listMedicion[cont].iniciar();
 				this->tabla->setValor("",fila,COLUMNA_ERROR);
 			}catch(int e){
        			this->tabla->setChecked(fila,false);
@@ -131,10 +130,10 @@ void Dispositivos::iniciar(int fila){
 //finaliza la medicion de un dispositivo
 void Dispositivos::finalizar(int fila){
 	std::clog<<"[Dispositivos] finalizar fila: "<<fila<<std::endl;
-	char unidad=getUnidad(fila);
+	char unidad=this->getUnidad(fila);
 	for(int cont=0;cont<'Z'-'A'&&unidad;cont++){
-		if(this->aMedicion[cont].getDispositivo()==unidad){
-			this->aMedicion[cont].detener();
+		if(this->listMedicion[cont].getDispositivo()==unidad){
+			this->listMedicion[cont].detener();
 		}
 	}
 }
@@ -147,14 +146,14 @@ void Dispositivos::mostrarMedicion(){
 	int tam=this->tabla->getNumFilas();
 	int operaciones,error;
 	for(int fila=0;fila<tam;fila++){
-		unidad=getUnidad(fila);
+		unidad=this->getUnidad(fila);
 		salir=true;
 		for(int cont=0;cont<'Z'-'A'&&salir&&unidad;cont++){
-			if(this->aMedicion[cont].getDispositivo()==unidad){
-				operaciones=this->aMedicion[cont].getOperaciones(&error);
+			if(this->listMedicion[cont].getDispositivo()==unidad){
+				operaciones=this->listMedicion[cont].getOperaciones(&error);
 				if(operaciones>=0){
 					this->tabla->setValor(std::to_string(operaciones),fila,COLUMNA_SECTORES_SEGUNDO);
-					this->tabla->setValor(mostrarBytesSegundo(this->aMedicion[cont].getByteSector()*operaciones),fila,COLUMNA_BYTES_SEGUNDO);
+					this->tabla->setValor(mostrarBytesSegundo(this->listMedicion[cont].getByteSector()*operaciones),fila,COLUMNA_BYTES_SEGUNDO);
 					std::stringstream stream;
 					stream<<std::setprecision(2)<<((error+operaciones)?(float)error*100./(error+operaciones):0.)<<" %";
 					this->tabla->setValor(stream.str(),fila,COLUMNA_PORCENTAJE_ERRORES);

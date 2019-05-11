@@ -2,12 +2,7 @@
 //inicio del programa
 static const std::string nombreClase="VelocidadHDD";
 
-static Ventana *pVentana;
-static Tabla *pTabla;
-static Dispositivos *pDispositivos;
-static Temporizador *pTemporizador;
-
-static void error(std::string *error,int num);
+static void error(std::string error,int num);
 
 //Arranca el bucle de mensajes
 static int bucleMensajes(HWND hVentana);

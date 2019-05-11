@@ -1,4 +1,5 @@
 #include <atomic>
+#include <memory>
 
 #include "Unidad.h"
 
@@ -8,7 +9,7 @@ class Medicion{
 		std::atomic_bool finHilo;
 		std::atomic_int operaciones,error;
 		char dispositivo;
-		Unidad *unidad;
+		std::shared_ptr<Unidad> unidad;
 		HANDLE hHilo;
 		
 		static int hilo(Medicion *medicion);

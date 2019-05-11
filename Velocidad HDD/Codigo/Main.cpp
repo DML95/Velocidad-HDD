@@ -4,6 +4,7 @@
 #include <windows.h>
 #include <dbt.h>
 #include <commctrl.h>
+#include <memory>
 
 #include "Temporizador.h"
 #include "ControlesEspeciales.h"
@@ -11,6 +12,10 @@
 #include "Clase.h"
 #include "Main.h"
 
+static std::shared_ptr<Ventana> ventana;
+static std::shared_ptr<Tabla> tabla;
+static std::shared_ptr<Dispositivos> dispositivos;
+static std::shared_ptr<Temporizador> temporizador;
 
 static void error(std::string error,int num){
 	std::string texto="Error clase '"+error+"'\n\nError numero "+std::to_string(num);
@@ -38,12 +43,12 @@ static WNDPROC evento(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam){
 		//Redimension de la ventana
 		case WM_SIZE:
 			std::clog<<"[evento] WM_SIZE"<<std::endl;
-			pTabla->setTamano(LOWORD(lParam),HIWORD(lParam));
+			tabla->setTamano(LOWORD(lParam),HIWORD(lParam));
 			break;
 		//Evento temporizador
 		case WM_TIMER:
 			std::srand(std::rand());
-			pDispositivos->mostrarMedicion();
+			dispositivos->mostrarMedicion();
 			break;
 		//Notificaciones de la tabla
 		case WM_NOTIFY:{
@@ -54,11 +59,11 @@ static WNDPROC evento(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam){
 	        		std::clog<<"[evento] WM_NOTIFY\n\tLVN_ITEMCHANGED"<<std::endl;
 	        		switch(nmlist->uNewState&LVIS_STATEIMAGEMASK){
 	        			case INDEXTOSTATEIMAGEMASK(BST_CHECKED+1):
-	        				pDispositivos->iniciar(nmlist->iItem);
+	        				dispositivos->iniciar(nmlist->iItem);
 	        				
 	        				break;
 	        			case INDEXTOSTATEIMAGEMASK(BST_UNCHECKED+1):
-	        				pDispositivos->finalizar(nmlist->iItem);
+	        				dispositivos->finalizar(nmlist->iItem);
 					}
 			}
 	        break;
@@ -73,7 +78,7 @@ static WNDPROC evento(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam){
 					std::clog<<"\tDBT_DEVICEARRIVAL || DBT_DEVICEREMOVECOMPLETE"<<std::endl;
 					if(lpdb->dbch_devicetype==DBT_DEVTYP_VOLUME){
 						std::clog<<"\t\tDBT_DEVTYP_VOLUME"<<std::endl;
-			            pDispositivos->actualizar();
+			            dispositivos->actualizar();
 			        }
 			}
 			break;
@@ -89,16 +94,16 @@ static WNDPROC evento(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam){
 		case WM_CREATE:{
 			std::clog<<"[evento] WM_CREATE"<<std::endl;
 			try{
-				pTabla=new Tabla(hWnd);
+				tabla=std::make_shared<Tabla>(hWnd);
 				
-				pTabla->setEstilos(WS_VISIBLE|WS_CHILD|WS_TABSTOP|LVS_REPORT|LBS_NOTIFY);
-				pTabla->setEstilosEx(WS_EX_CLIENTEDGE);
-				pTabla->setEstilosTabla(LVS_EX_FULLROWSELECT|LVS_EX_GRIDLINES|LVS_EX_CHECKBOXES);
-				pTabla->setPosicion(0,0);
+				tabla->setEstilos(WS_VISIBLE|WS_CHILD|WS_TABSTOP|LVS_REPORT|LBS_NOTIFY);
+				tabla->setEstilosEx(WS_EX_CLIENTEDGE);
+				tabla->setEstilosTabla(LVS_EX_FULLROWSELECT|LVS_EX_GRIDLINES|LVS_EX_CHECKBOXES);
+				tabla->setPosicion(0,0);
 				
-				pDispositivos=new Dispositivos(pTabla);
-				pDispositivos->actualizar();
-				pTemporizador=new Temporizador(hWnd,1000);
+				dispositivos=std::make_shared<Dispositivos>(tabla);
+				dispositivos->actualizar();
+				temporizador=std::make_shared<Temporizador>(hWnd,1000);
 			}catch(int e){
 				DestroyWindow(hWnd);
 				error("Tabla",e);
@@ -108,9 +113,6 @@ static WNDPROC evento(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam){
 		//Desatruccion de la ventana
 		case WM_DESTROY:{
 			std::clog<<"[evento] WM_DESTROY"<<std::endl;
-			delete pTemporizador;
-			delete pTabla;
-			delete pDispositivos;
 		    PostQuitMessage(0);
 		    break;
 		}
@@ -132,16 +134,14 @@ int main(int argc, char** argv) {
 		try{
 			ControlesEspeciales(ICC_LISTVIEW_CLASSES);
 			try{
-				Clase clase=Clase(nombreClase,(WNDPROC)&evento);
+				Clase clase(nombreClase,(WNDPROC)&evento);
 				try{
-					pVentana=new Ventana(clase.getClase());
+					ventana=std::make_shared<Ventana>(clase.getClase());
 					
-					pVentana->setEstilos(WS_OVERLAPPEDWINDOW|WS_VISIBLE);
-					pVentana->setTamano(700,400);
-					pVentana->setTexto("Velocidad HDD");						
-					//pVentana->repintar();
-					bucleMensajes(pVentana->getVentana());
-					delete pVentana;
+					ventana->setEstilos(WS_OVERLAPPEDWINDOW|WS_VISIBLE);
+					ventana->setTamano(700,400);
+					ventana->setTexto("Velocidad HDD");
+					bucleMensajes(ventana->getVentana());
 					salida=0;
 				}catch(int e){
 					error("Ventana",e);

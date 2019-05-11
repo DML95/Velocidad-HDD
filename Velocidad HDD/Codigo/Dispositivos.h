@@ -1,11 +1,13 @@
+#include<vector>
+
 #include "Tabla.h"
 #include "Medicion.h"
 
 //controlador de la tabla de windows
 class Dispositivos{
 	private:
-		Medicion *aMedicion;
-		Tabla *tabla;
+		std::vector<Medicion> listMedicion;
+		std::shared_ptr<Tabla> tabla;
 		int dispositivos;
 		
 		std::string mostrarBytesSegundo(float bytes);
@@ -20,7 +22,7 @@ class Dispositivos{
 		
 	public:
 		//Constructor
-		Dispositivos(Tabla *tabla);
+		Dispositivos(std::shared_ptr<Tabla> &tabla);
 		//Destructor
 		~Dispositivos();
 		//Actualiza la tabla
