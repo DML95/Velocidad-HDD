@@ -3,9 +3,10 @@
 
 #include "Temporizador.h"
 
-Temporizador::Temporizador(HWND hVentana,int tiempo){
+Temporizador::Temporizador(std::shared_ptr<Ventana> &ventana,int tiempo):
+		ventana(ventana){
 	std::clog<<"[Temporizador] creando tiempo: "<<tiempo<<std::endl;
-	this->hTemporizador=SetTimer(hVentana,0,tiempo,0);
+	this->hTemporizador=SetTimer(ventana->get(),0,tiempo,0);
 	if(!this->hTemporizador){
 		throw (int)GetLastError();
 	}

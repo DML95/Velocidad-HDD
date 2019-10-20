@@ -163,3 +163,10 @@ void Dispositivos::mostrarMedicion(){
 		}
 	}
 }
+
+void Dispositivos::setMode(Medicion::mode mode){
+	std::clog<<"[Medicion] estableciendo modo: "<<mode<<std::endl;
+	for(int cont=0;cont<'Z'-'A';cont++){
+		this->listMedicion[cont].setMode(mode);
+	}
+}

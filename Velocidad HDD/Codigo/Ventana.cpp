@@ -58,7 +58,7 @@ Ventana::~Ventana(){
 }
 
 //Getter HWND ventana
-HWND Ventana::getVentana(){
+HWND Ventana::get(){
 	return this->hVentana;
 }
 
@@ -111,7 +111,7 @@ void Ventana::setTexto(std::string texto){
 
 //Getter setter Padre
 void Ventana::setPadre(Ventana *padre){
-	SetParent(this->hVentana,padre->getVentana());
+	SetParent(this->hVentana,padre->get());
 }
 
 void Ventana::setPadre(HWND hVentana){
@@ -136,4 +136,12 @@ void Ventana::repintar(){
 void Ventana::destruir(){
 	std::clog<<"[Ventana:"<<this->hVentana<<"] eliminado ventana"<<std::endl;
 	DestroyWindow(this->hVentana);
+}
+
+//agrega un menu
+void Ventana::setMenu(std::shared_ptr<Menu> &menu){
+	std::clog<<"[Ventana:"<<this->hVentana<<"] estableciendo menu"<<std::endl;
+	this->menu=menu;
+	SetMenu(this->hVentana,menu->get());
+	DrawMenuBar(this->hVentana);
 }

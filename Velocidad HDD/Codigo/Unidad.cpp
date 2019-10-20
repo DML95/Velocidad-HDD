@@ -7,8 +7,8 @@ Unidad::Unidad(char unidad){
 	std::clog<<"[Unidad] iniciando unidad: "<<unidad<<std::endl;
 	int tam;
 	DISK_GEOMETRY disco;
-	char nombreUnidad[]="\\\\.\\ :";
-	nombreUnidad[4]=unidad;
+	char nombreUnidad[8];
+	std::sprintf(nombreUnidad,"\\\\.\\%c:",unidad);
 	this->hUnidad=CreateFile(
 			nombreUnidad,
 			GENERIC_READ,

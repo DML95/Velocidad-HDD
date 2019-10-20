@@ -11,11 +11,20 @@
 #include "Dispositivos.h"
 #include "Clase.h"
 #include "Main.h"
+#include "Menu.h"
+
+#define ID_EXIT 1
+#define ID_RANDOM 2
+#define ID_LINEAR 3
 
 static std::shared_ptr<Ventana> ventana;
 static std::shared_ptr<Tabla> tabla;
 static std::shared_ptr<Dispositivos> dispositivos;
 static std::shared_ptr<Temporizador> temporizador;
+
+//menu
+static std::shared_ptr<Menu> mainMenu;
+static std::shared_ptr<Menu> propertiesMenu;
 
 static void error(std::string error,int num){
 	std::string texto="Error clase '"+error+"'\n\nError numero "+std::to_string(num);
@@ -68,6 +77,25 @@ static WNDPROC evento(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam){
 			}
 	        break;
 		}
+		case WM_COMMAND:{
+			std::clog<<"[evento] WM_COMMAND"<<std::endl;
+			switch(LOWORD(wParam)){
+				case ID_EXIT:
+					ventana->destruir();
+					break;
+				case ID_RANDOM:
+					propertiesMenu->setChack(ID_RANDOM,true);
+					propertiesMenu->setChack(ID_LINEAR,false);
+					dispositivos->setMode(Medicion::mode::random);
+					break;
+				case ID_LINEAR:
+					propertiesMenu->setChack(ID_RANDOM,false);
+					propertiesMenu->setChack(ID_LINEAR,true);
+					dispositivos->setMode(Medicion::mode::linear);
+					break;
+			}
+            break;
+        }
 		//Cambio de dispositivos
 		case WM_DEVICECHANGE:{
 			std::clog<<"[evento] WM_DEVICECHANGE"<<std::endl;
@@ -88,26 +116,6 @@ static WNDPROC evento(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam){
 			MINMAXINFO *mmi=(MINMAXINFO*)lParam;
 		    mmi->ptMinTrackSize.x = 200;
 		    mmi->ptMinTrackSize.y = 100;
-			break;
-		}
-		//Creacion de la ventana
-		case WM_CREATE:{
-			std::clog<<"[evento] WM_CREATE"<<std::endl;
-			try{
-				tabla=std::make_shared<Tabla>(hWnd);
-				
-				tabla->setEstilos(WS_VISIBLE|WS_CHILD|WS_TABSTOP|LVS_REPORT|LBS_NOTIFY);
-				tabla->setEstilosEx(WS_EX_CLIENTEDGE);
-				tabla->setEstilosTabla(LVS_EX_FULLROWSELECT|LVS_EX_GRIDLINES|LVS_EX_CHECKBOXES);
-				tabla->setPosicion(0,0);
-				
-				dispositivos=std::make_shared<Dispositivos>(tabla);
-				dispositivos->actualizar();
-				temporizador=std::make_shared<Temporizador>(hWnd,1000);
-			}catch(int e){
-				DestroyWindow(hWnd);
-				error("Tabla",e);
-			}
 			break;
 		}
 		//Desatruccion de la ventana
@@ -136,12 +144,48 @@ int main(int argc, char** argv) {
 			try{
 				Clase clase(nombreClase,(WNDPROC)&evento);
 				try{
+					//creando ventana
 					ventana=std::make_shared<Ventana>(clase.getClase());
 					
-					ventana->setEstilos(WS_OVERLAPPEDWINDOW|WS_VISIBLE);
-					ventana->setTamano(700,400);
+					//iniciando menu
+					mainMenu=std::make_shared<Menu>();
+					
+					//iniciando submenu archivos
+					std::shared_ptr<Menu> fileMenu=std::make_shared<Menu>();
+					fileMenu->add(ID_EXIT,"Salir");
+					mainMenu->add(fileMenu,"Archivo");
+					
+					//iniciando submenu propiedades
+					propertiesMenu=std::make_shared<Menu>();
+					propertiesMenu->add(ID_RANDOM,true,"Aleatorio");
+					propertiesMenu->add(ID_LINEAR,false,"Lineal");
+					mainMenu->add(propertiesMenu,"Propiedades");
+					
+					ventana->setMenu(mainMenu);
+					
+					//iniciando tabla
+					tabla=std::make_shared<Tabla>(ventana);
+					
+					tabla->setEstilos(WS_VISIBLE|WS_CHILD|WS_TABSTOP|LVS_REPORT|LBS_NOTIFY);
+					tabla->setEstilosEx(WS_EX_CLIENTEDGE);
+					tabla->setEstilosTabla(LVS_EX_FULLROWSELECT|LVS_EX_GRIDLINES|LVS_EX_CHECKBOXES);
+					tabla->setPosicion(0,0);
+					
+					//iniciando dispositivo
+					dispositivos=std::make_shared<Dispositivos>(tabla);
+					dispositivos->actualizar();
+					
+					//iniciando temporizador
+					temporizador=std::make_shared<Temporizador>(ventana,1000);
+					
+					//estableciendo parametros ventana
 					ventana->setTexto("Velocidad HDD");
-					bucleMensajes(ventana->getVentana());
+					ventana->setEstilos(WS_OVERLAPPEDWINDOW|WS_VISIBLE);
+					ventana->setTamano(700,450);
+					
+					
+					
+					bucleMensajes(ventana->get());
 					salida=0;
 				}catch(int e){
 					error("Ventana",e);

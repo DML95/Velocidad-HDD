@@ -4,7 +4,13 @@
 
 #include "Tabla.h"
 
-Tabla::Tabla(HWND padre):Ventana(WC_LISTVIEW,padre){
+/*Tabla::Tabla(HWND padre):Ventana(WC_LISTVIEW,padre){
+	std::clog<<"[Tabla:"<<this->hVentana<<"] tabla creada"<<std::endl;
+}*/
+
+Tabla::Tabla(std::shared_ptr<Ventana> &ventana):
+		ventana(ventana),
+		Ventana(WC_LISTVIEW,ventana->get()){
 	std::clog<<"[Tabla:"<<this->hVentana<<"] tabla creada"<<std::endl;
 }
 

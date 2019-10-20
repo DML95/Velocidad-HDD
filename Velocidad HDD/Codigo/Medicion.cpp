@@ -12,11 +12,11 @@ int Medicion::hilo(Medicion *medicion){
 	char buffer[2*tamanoSector-1];
 	const char *bufferAlineado=(char*)((long long)(buffer+tamanoSector-1)&~(tamanoSector-1));
 	const long long numSectores=medicion->unidad->getNumSector();
-	const int size=MAXIMUM_WAIT_OBJECTS; //Maximos elementos de WaitForMultipleObjects
-	std::vector<HANDLE> listEvent(size);
-	std::vector<OVERLAPPED> listOverlapped(size);
+	std::vector<HANDLE> listEvent(MAXIMUM_WAIT_OBJECTS);
+	std::vector<OVERLAPPED> listOverlapped(MAXIMUM_WAIT_OBJECTS);
+	long long sector=0;
 	//iniciamos los la lista de eventos
-	for(int cont=0;cont<size;++cont){
+	for(int cont=0;cont<MAXIMUM_WAIT_OBJECTS;++cont){
 		HANDLE event=CreateEvent(NULL,true,true,NULL);
 		listEvent[cont]=event;
 		OVERLAPPED *overlapped=&listOverlapped[cont];
@@ -25,7 +25,7 @@ int Medicion::hilo(Medicion *medicion){
 	}
 	//iniciamos el bucle principal
 	while(medicion->finHilo){
-		const long long sector=longLongAleatorio(numSectores);
+		medicion->getSector(sector,numSectores);
 		const int eventId=WaitForMultipleObjects(listEvent.capacity(),listEvent.data(),false,INFINITE)-WAIT_OBJECT_0;
 		if(eventId>=0){
 			OVERLAPPED *overlapped=&listOverlapped[eventId];
@@ -42,20 +42,25 @@ int Medicion::hilo(Medicion *medicion){
 	}
 	WaitForMultipleObjects(listEvent.capacity(),listEvent.data(),true,INFINITE);
 	//cerramos los la lista de eventos
-	for(int cont=0;cont<size;++cont){
+	for(int cont=0;cont<MAXIMUM_WAIT_OBJECTS;++cont){
 		CloseHandle(listEvent[cont]);
 	}
 	std::clog<<"[Medicion] finalizando hilo unidad: "<<medicion->getDispositivo()<<std::endl;
 	return 0;
 }
 
-long long Medicion::longLongAleatorio(long long maximo){
+void Medicion::getRandonSector(long long &selectSector,long long numSectors){
 	long long out=0;
-	for(int cont=0;cont<4&&out<maximo;cont++){
+	for(int cont=0;cont<4&&out<numSectors;cont++){
 		out|=std::rand();
 		out<<=16;
 	}
-	return out%maximo;
+	selectSector=out%numSectors;
+}
+
+void Medicion::getLinearSector(long long &selectSector,long long numSectors){
+	selectSector++;
+	selectSector%=numSectors;
 }
 
 //Constructor
@@ -67,6 +72,7 @@ Medicion::Medicion(){
 	this->unidad=0;
 	this->operaciones=-1;
 	this->error=-1;
+	this->getSector.exchange(Medicion::getRandonSector);
 }
 
 //Destructor
@@ -120,4 +126,15 @@ int Medicion::getByteSector(){
 void Medicion::setDispositivo(char dispositivo){
 	std::clog<<"[Medicion] estableciendo dispositivo: "<<dispositivo<<std::endl;
 	this->dispositivo=dispositivo;
+}
+
+void Medicion::setMode(Medicion::mode mode){
+	switch(mode){
+		case Medicion::mode::random:
+			this->getSector.exchange(Medicion::getRandonSector);
+			break;
+		case Medicion::mode::linear:
+			this->getSector.exchange(Medicion::getLinearSector);
+			break;
+	}
 }
