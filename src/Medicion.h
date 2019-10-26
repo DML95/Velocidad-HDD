@@ -19,11 +19,11 @@
 			static int hilo(Medicion *medicion);
 			
 			static void getRandonSector(long long &selectSector,long long numSectors);
-			static void getLinearSector(long long &selectSector,long long numSectors);
+			static void getSequentialSector(long long &selectSector,long long numSectors);
 		public:
 			//constantes
 			enum mode{
-				random,linear
+				random,sequential
 			};
 			
 			//Constructor

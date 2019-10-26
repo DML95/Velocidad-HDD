@@ -15,7 +15,7 @@
 
 #define ID_EXIT 1
 #define ID_RANDOM 2
-#define ID_LINEAR 3
+#define ID_SEQUENTIAL 3
 
 static std::shared_ptr<Ventana> ventana;
 static std::shared_ptr<Tabla> tabla;
@@ -85,13 +85,13 @@ static WNDPROC evento(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam){
 					break;
 				case ID_RANDOM:
 					propertiesMenu->setChack(ID_RANDOM,true);
-					propertiesMenu->setChack(ID_LINEAR,false);
+					propertiesMenu->setChack(ID_SEQUENTIAL,false);
 					dispositivos->setMode(Medicion::mode::random);
 					break;
-				case ID_LINEAR:
+				case ID_SEQUENTIAL:
 					propertiesMenu->setChack(ID_RANDOM,false);
-					propertiesMenu->setChack(ID_LINEAR,true);
-					dispositivos->setMode(Medicion::mode::linear);
+					propertiesMenu->setChack(ID_SEQUENTIAL,true);
+					dispositivos->setMode(Medicion::mode::sequential);
 					break;
 			}
             break;
@@ -158,7 +158,7 @@ int main(int argc, char** argv) {
 					//iniciando submenu propiedades
 					propertiesMenu=std::make_shared<Menu>();
 					propertiesMenu->add(ID_RANDOM,true,"Aleatorio");
-					propertiesMenu->add(ID_LINEAR,false,"Lineal");
+					propertiesMenu->add(ID_SEQUENTIAL,false,"Secuencial");
 					mainMenu->add(propertiesMenu,"Propiedades");
 					
 					ventana->setMenu(mainMenu);
