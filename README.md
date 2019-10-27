@@ -3,3 +3,7 @@
 Aplicación para determinar la velocidad de discos duros y otras unidades mediante la lectura aleatoria de sectores, con interfaz gráfica.
 
 [Descargar programa](https://github.com/DML95/Velocidad-HDD/raw/master/bin/Velocidad%20HDD.exe) (Requiere modo administrador para funcionar bien)
+
+* Copilador -> CPP
+* IDE -> Dev-C++
+* Sistema Opertivo -> Windows
