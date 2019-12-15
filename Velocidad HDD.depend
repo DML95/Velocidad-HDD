@@ -1,0 +1,143 @@
+# depslib dependency file v1.0
+1576319858 source:c:\users\david\documents\programas\c++\programas\velocidad hdd\src\clase.cpp
+	<windows.h>
+	<iostream>
+	"clase.h"
+
+1576319821 c:\users\david\documents\programas\c++\programas\velocidad hdd\src\clase.h
+	<string>
+
+1572693538 source:c:\users\david\documents\programas\c++\programas\velocidad hdd\src\controlesespeciales.cpp
+	<windows.h>
+	<commctrl.h>
+	<iostream>
+	"controlesEspeciales.h"
+
+1571685199 c:\users\david\documents\programas\c++\programas\velocidad hdd\src\controlesespeciales.h
+
+1576412799 source:c:\users\david\documents\programas\c++\programas\velocidad hdd\src\controltabla.cpp
+	<cstdio>
+	<iostream>
+	<iomanip>
+	<sstream>
+	"controlTabla.h"
+
+1576412679 c:\users\david\documents\programas\c++\programas\velocidad hdd\src\controltabla.h
+	<windows.h>
+	<vector>
+	"tabla.h"
+	"ventana.h"
+	"deviceInfo.h"
+	"deviceMeasuring.h"
+
+1576329252 c:\users\david\documents\programas\c++\programas\velocidad hdd\src\tabla.h
+	<memory>
+	<string>
+	"ventanaAbstract.h"
+
+1576336686 c:\users\david\documents\programas\c++\programas\velocidad hdd\src\ventanaabstract.h
+	<windows.h>
+	<string>
+	<memory>
+	"clase.h"
+	"menu.h"
+
+1571685199 c:\users\david\documents\programas\c++\programas\velocidad hdd\src\menu.h
+	<windows.h>
+	<vector>
+	<memory>
+
+1576411438 c:\users\david\documents\programas\c++\programas\velocidad hdd\src\ventana.h
+	<windows.h>
+	<string>
+	<memory>
+	"ventanaAbstract.h"
+	"clase.h"
+	"menu.h"
+
+1576413049 c:\users\david\documents\programas\c++\programas\velocidad hdd\src\deviceinfo.h
+	<string>
+	<vector>
+	<windows.h>
+
+1576424692 c:\users\david\documents\programas\c++\programas\velocidad hdd\src\devicemeasuring.h
+	<atomic>
+	<memory>
+	<string>
+	<thread>
+	<windows.h>
+	"deviceInfo.h"
+
+1575890882 c:\users\david\documents\programas\c++\programas\velocidad hdd\src\wait.h
+	<memory>
+	<condition_variable>
+	<mutex>
+
+1576413049 source:c:\users\david\documents\programas\c++\programas\velocidad hdd\src\deviceinfo.cpp
+	<securitybaseapi.h>
+	<iostream>
+	<cstring>
+	"deviceInfo.h"
+
+1576413393 source:c:\users\david\documents\programas\c++\programas\velocidad hdd\src\devicemeasuring.cpp
+	<iostream>
+	"deviceMeasuring.h"
+	"overlappeds.h"
+
+1576411810 c:\users\david\documents\programas\c++\programas\velocidad hdd\src\overlappeds.h
+	<windows.h>
+	<vector>
+
+1576413811 source:c:\users\david\documents\programas\c++\programas\velocidad hdd\src\main.cpp
+	<iostream>
+	"main.h"
+
+1576413498 c:\users\david\documents\programas\c++\programas\velocidad hdd\src\main.h
+	<cstdio>
+	<string>
+	<windows.h>
+	<dbt.h>
+	<commctrl.h>
+	<memory>
+	"temporizador.h"
+	"controlesEspeciales.h"
+	"controlTabla.h"
+	"clase.h"
+	"menu.h"
+
+1572693510 c:\users\david\documents\programas\c++\programas\velocidad hdd\src\temporizador.h
+	"ventana.h"
+
+1576413932 source:c:\users\david\documents\programas\c++\programas\velocidad hdd\src\menu.cpp
+	<iostream>
+	<stdexcept>
+	"menu.h"
+
+1576413976 source:c:\users\david\documents\programas\c++\programas\velocidad hdd\src\overlappeds.cpp
+	"overlappeds.h"
+
+1576414296 source:c:\users\david\documents\programas\c++\programas\velocidad hdd\src\tabla.cpp
+	<windows.h>
+	<commctrl.h>
+	<iostream>
+	<cstring>
+	"tabla.h"
+
+1576414324 source:c:\users\david\documents\programas\c++\programas\velocidad hdd\src\temporizador.cpp
+	<windows.h>
+	<iostream>
+	"temporizador.h"
+
+1576414370 source:c:\users\david\documents\programas\c++\programas\velocidad hdd\src\ventana.cpp
+	<windows.h>
+	<iostream>
+	"ventana.h"
+
+1576414479 source:c:\users\david\documents\programas\c++\programas\velocidad hdd\src\ventanaabstract.cpp
+	<iostream>
+	"ventanaAbstract.h"
+
+1575890908 source:c:\users\david\documents\programas\c++\programas\velocidad hdd\src\wait.cpp
+	<iostream>
+	"wait.h"
+

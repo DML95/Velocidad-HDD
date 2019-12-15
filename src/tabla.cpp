@@ -1,6 +1,7 @@
 #include <windows.h>
 #include <commctrl.h>
 #include<iostream>
+#include <cstring>
 
 #include "tabla.h"
 
@@ -11,7 +12,7 @@ Tabla::Tabla(std::shared_ptr<VentanaAbstract> &padre):
 }
 
 //Columnas
-void Tabla::agregarColumna(std::string texto,int anchuraPx,int posicion){
+void Tabla::agregarColumna(const std::string texto,const int anchuraPx,const int posicion){
 	std::clog<<"[Tabla:"<<this->hVentana<<"] agregar columna"<<
 			"\n\ttexto: "<<texto<<
 			"\n\tanchura pixeles: "<<anchuraPx<<
@@ -25,25 +26,23 @@ void Tabla::agregarColumna(std::string texto,int anchuraPx,int posicion){
 }
 
 //Filas
-void Tabla::agregarFilas(int numFilas,int posicion){
+void Tabla::agregarFilas(const int numFilas,const int posicion){
 	std::clog<<"[Tabla:"<<this->hVentana<<"] agregar filas"<<
 			"\n\tnumero filas: "<<numFilas<<
 			"\n\tposicion: "<<posicion<<std::endl;
-	int cont;
 	LVITEM datosFila;
-	ZeroMemory(&datosFila,sizeof(LVITEM));
+	std::memset(&datosFila,0,sizeof(LVITEM));
 	datosFila.iItem=posicion;
-	for(cont=0;cont<numFilas;cont++){
+	for(int cont=0;cont<numFilas;cont++){
 		SendMessage(this->hVentana,LVM_INSERTITEM,0,(LPARAM)&datosFila);
 	}
 }
 
-void Tabla::eliminarFilas(int numFilas,int posicion){
+void Tabla::eliminarFilas(const int numFilas,const int posicion){
 	std::clog<<"[Tabla:"<<this->hVentana<<"] eliminar filas"<<
 			"\n\tnumero filas: "<<numFilas<<
 			"\n\tposicion: "<<posicion<<std::endl;
-	int cont;
-	for(cont=0;cont<numFilas;cont++){
+	for(int cont=0;cont<numFilas;cont++){
 		SendMessage(this->hVentana,LVM_DELETEITEM,posicion,0);
 	}
 }
@@ -53,7 +52,7 @@ int Tabla::getNumFilas(){
 }
 
 //Celdas
-void Tabla::setValor(std::string texto,int fila,int columna){
+void Tabla::setValor(const std::string texto,const int fila,const int columna){
 	std::clog<<"[Tabla:"<<this->hVentana<<"] set valor"<<
 			"\n\ttexto: "<<texto<<
 			"\n\tfila: "<<fila<<
@@ -64,7 +63,7 @@ void Tabla::setValor(std::string texto,int fila,int columna){
 	SendMessage(this->hVentana,LVM_SETITEMTEXT,fila,(LPARAM)&datosFila);
 }
 
-std::string Tabla::getValor(int fila,int columna){
+std::string Tabla::getValor(const int fila,const int columna){
 	std::string texto(0xff,0);
 	LVITEM datosFila;
 	datosFila.iSubItem=columna;
@@ -76,7 +75,7 @@ std::string Tabla::getValor(int fila,int columna){
 }
 
 //checkbox
-void Tabla::setChecked(int fila,bool checked){
+void Tabla::setChecked(const int fila,const bool checked){
 	std::clog<<"[Tabla:"<<this->hVentana<<"] checked fila"<<
 			"\n\tfila: "<<fila<<
 			"\n\tchecked: "<<checked<<std::endl;
@@ -87,6 +86,6 @@ void Tabla::setChecked(int fila,bool checked){
 }
 
 //Estilo
-void Tabla::setEstilosTabla(int estilos){
+void Tabla::setEstilosTabla(const int estilos){
 	SendMessage(this->hVentana,LVM_SETEXTENDEDLISTVIEWSTYLE,0,estilos);
 }

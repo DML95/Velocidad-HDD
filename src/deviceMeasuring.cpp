@@ -8,15 +8,13 @@ bool DeviceMeasuring::readSector(std::vector<char> &buffer,OVERLAPPED *overlappe
 }
 
 void DeviceMeasuring::mainThread(DeviceMeasuring *deviceMeasuring){
-	std::string name=deviceMeasuring->deviceInfo->get();
+	const std::string name=deviceMeasuring->deviceInfo->get();
 	std::clog<<"[DeviceMeasuring: '"<<name<<"' ] iniciando hilo"<<std::endl;
-	HANDLE handleTemp;
 	long long sector=0;
 	DWORD size;
 	std::vector<char> buffer(deviceMeasuring->sizeSector);
 	Overlappeds overlappeds;
 	deviceMeasuring->run.exchange(true);
-	deviceMeasuring->wait.notify_all();
 	//se crean operaciones asincronas hasta la destruccion de la clase
 	for(HANDLE handleTemp=deviceMeasuring->handle;handleTemp&&deviceMeasuring->run;handleTemp=deviceMeasuring->handle){
 		deviceMeasuring->getSector(sector,deviceMeasuring->numberSectors);
@@ -27,7 +25,7 @@ void DeviceMeasuring::mainThread(DeviceMeasuring *deviceMeasuring){
 				if(GetOverlappedResult(deviceMeasuring->handle,overlapped,&size,false)){
 					deviceMeasuring->operations.fetch_add(1);
 				}else{
-					int error=GetLastError();
+					const int error=GetLastError();
 					switch(error){
 						//error en sector
 						case ERROR_CRC:
@@ -43,7 +41,7 @@ void DeviceMeasuring::mainThread(DeviceMeasuring *deviceMeasuring){
 			overlapped->Internal=0;
 			overlapped->InternalHigh=0;
 			if(DeviceMeasuring::readSector(buffer,overlapped,deviceMeasuring)){
-				int error=GetLastError();
+				const int error=GetLastError();
 				switch(error){
 					//no es un error
 					case ERROR_IO_PENDING:
@@ -59,7 +57,7 @@ void DeviceMeasuring::mainThread(DeviceMeasuring *deviceMeasuring){
 	std::clog<<"[DeviceMeasuring: '"<<name<<"' ] finalizando hilo"<<std::endl;
 }
 
-void DeviceMeasuring::getRandonSector(long long &selectSector,long long numberSectors){
+void DeviceMeasuring::getRandonSector(long long &selectSector,const long long numberSectors){
 	long long out=0;
 	for(int cont=0;cont<4&&out<numberSectors;cont++){
 		out|=std::rand();
@@ -68,7 +66,7 @@ void DeviceMeasuring::getRandonSector(long long &selectSector,long long numberSe
 	selectSector=out%numberSectors;
 }
 
-void DeviceMeasuring::getSequentialSector(long long &selectSector,long long numberSectors){
+void DeviceMeasuring::getSequentialSector(long long &selectSector,const long long numberSectors){
 	selectSector++;
 	if(selectSector>numberSectors){
 		selectSector=0l;
@@ -106,8 +104,7 @@ void DeviceMeasuring::readGeometryInfo(){
 }
 
 DeviceMeasuring::DeviceMeasuring(std::shared_ptr<DeviceInfo> &deviceInfo,DeviceMeasuring::mode mode,bool (*errorAsync)(DeviceMeasuring*,int,void*),void *paramError):
-		deviceInfo(deviceInfo),
-		wait(){
+		deviceInfo(deviceInfo){
 	std::string name=this->deviceInfo->get();
 	std::clog<<"[DeviceMeasuring: '"<<name<<"' ] creando medicion"<<std::endl;
 	this->errorAsync=errorAsync;
@@ -119,25 +116,24 @@ DeviceMeasuring::DeviceMeasuring(std::shared_ptr<DeviceInfo> &deviceInfo,DeviceM
 	this->init(name);
 	this->readGeometryInfo();
 	this->thread=std::thread(DeviceMeasuring::mainThread,this);
-	while(!run)this->wait.wait();
 }
 
 DeviceMeasuring::~DeviceMeasuring(){
 	std::clog<<"[DeviceMeasuring: '"<<this->deviceInfo->get()<<"' ] eliminado medicion"<<std::endl;
-	HANDLE handleTemp=this->handle.exchange(0);
+	const HANDLE handleTemp=this->handle.exchange(0);
 	CancelIo(handleTemp);
 	this->thread.join();
 	CloseHandle(handleTemp);
 }
 
 void DeviceMeasuring::getMeasuringAndReset(DeviceMeasuring::measuring &measuring){
-	long long operations=this->operations.exchange(0l);
+	const long long operations=this->operations.exchange(0l);
 	measuring.errors=this->errors.exchange(0l);
 	measuring.operations=operations;
 	measuring.bytes=operations*this->sizeSector;
 }
 
-void DeviceMeasuring::setMode(DeviceMeasuring::mode mode){
+void DeviceMeasuring::setMode(const DeviceMeasuring::mode mode){
 	std::clog<<"[DeviceMeasuring: '"<<this->deviceInfo->get()<<"' ] modificando modo: "<<mode<<std::endl;
 	switch(mode){
 		case DeviceMeasuring::mode::random:

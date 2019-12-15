@@ -2,7 +2,7 @@
 
 #include "ventanaAbstract.h"
 
-VentanaAbstract::VentanaAbstract(LPCTSTR hClase,HWND padre,int estilo){
+VentanaAbstract::VentanaAbstract(const LPCTSTR hClase,const HWND padre,const int estilo){
 	this->hVentana=CreateWindowExA(
 			0,
 			hClase,
@@ -57,7 +57,7 @@ int VentanaAbstract::getEstilosEx(){
 }
 
 //Getter y setter tamaño
-void VentanaAbstract::setTamano(int anchura,int altura){
+void VentanaAbstract::setTamano(const int anchura,const int altura){
 	std::clog<<"[VentanaAbstract:"<<this->hVentana<<"] estableciendo ventana"<<
 			"\n\tanchura: "<<anchura<<
 			"\n\taltura: "<<altura<<std::endl;
@@ -65,7 +65,7 @@ void VentanaAbstract::setTamano(int anchura,int altura){
 }
 
 //Getter y setter posicion
-void VentanaAbstract::setPosicion(int x,int y){
+void VentanaAbstract::setPosicion(const int x,const int y){
 	std::clog<<"[VentanaAbstract:"<<this->hVentana<<"] estableciendo ventana"<<
 			"\n\tx: "<<x<<
 			"\n\ty: "<<y<<std::endl;
@@ -79,6 +79,6 @@ void VentanaAbstract::destruir(){
 }
 
 //envia un evento asincrono a la ventana
-void VentanaAbstract::postMessage(UINT msg,WPARAM wParam,LPARAM lParam){
+void VentanaAbstract::postMessage(const UINT msg,const WPARAM wParam,const LPARAM lParam){
 	PostMessage(this->hVentana,msg,wParam,lParam);
 }

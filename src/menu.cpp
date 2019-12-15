@@ -14,20 +14,20 @@ Menu::~Menu(){
 	DestroyMenu(this->menu);
 }
 
-void Menu::add(int id,std::string text){
+void Menu::add(const int id,const std::string text){
 	std::clog<<"[Menu:"<<this->menu<<"] creando boton\n\tid: "<<id<<
 			"\n\ttext: "<<text<<std::endl;
 	AppendMenu(this->menu, MF_STRING,id,text.c_str());
 }
 
-void Menu::add(int id,bool check,std::string text){
+void Menu::add(const int id,const bool check,const std::string text){
 	std::clog<<"[Menu:"<<this->menu<<"] creando check\n\tid: "<<id<<
 			"\n\tcheck: "<<check<<
 			"\n\ttext: "<<text<<std::endl;
 	AppendMenu(this->menu,check?MF_CHECKED:MF_UNCHECKED,id,text.c_str());
 }
 
-void Menu::add(std::shared_ptr<Menu> &subMenu,std::string text){
+void Menu::add(std::shared_ptr<Menu> &subMenu,const std::string text){
 	std::clog<<"[Menu:"<<this->menu<<"] creando submenu\n\tpadre: "<<subMenu->get()<<
 			"\n\ttext: "<<text<<std::endl;
 	if(AppendMenu(this->menu, MF_POPUP,(UINT_PTR)subMenu->get(),text.c_str())){
@@ -35,7 +35,7 @@ void Menu::add(std::shared_ptr<Menu> &subMenu,std::string text){
 	}
 }
 
-void Menu::setChack(int id,bool check){
+void Menu::setChack(const int id,const bool check){
 	CheckMenuItem(this->menu,id,check?MF_CHECKED:MF_UNCHECKED);
 }
 

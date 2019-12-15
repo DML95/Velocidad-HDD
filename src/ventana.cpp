@@ -4,9 +4,9 @@
 #include "ventana.h"
 
 //Constructores
-Ventana::Ventana(std::shared_ptr<Clase> &clase):
-		clase(clase),
-		VentanaAbstract(clase->get(),0,0){
+Ventana::Ventana(const std::shared_ptr<Clase> &clase):
+        VentanaAbstract(clase->get(),0,0),
+		clase(clase){
 	std::clog<<"[Ventana:"<<hVentana<<"] ventana creada"<<std::endl;
 }
 
@@ -25,7 +25,7 @@ void Ventana::setPadre(std::shared_ptr<VentanaAbstract> &padre){
 }
 
 //Getter setter texto
-void Ventana::setTexto(std::string texto){
+void Ventana::setTexto(const std::string texto){
 	std::clog<<"[Ventana:"<<this->hVentana<<"] estableciendo ventana"<<
 			"\n\ttexto: "<<texto<<std::endl;
 	SetWindowText(this->hVentana,texto.c_str());

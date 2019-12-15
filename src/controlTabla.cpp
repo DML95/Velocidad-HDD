@@ -5,16 +5,16 @@
 
 #include "controlTabla.h"
 
-std::string ControlTabla::toString(float number,int decimalNumber){
+std::string ControlTabla::toString(const float number,const int decimalNumber){
 	std::stringstream stream;
 	stream<<std::fixed<<std::setprecision(decimalNumber)<<number;
 	return stream.str();
 }
 
-std::string ControlTabla::adjustmentUnit(long long bytes){
+std::string ControlTabla::adjustmentUnit(const long long bytes){
 	double decimalBytes=bytes;
-	int cont=0;
-	std::string unidades=" KMGTP";
+	unsigned long long cont=0;
+	const std::string unidades=" KMGTP";
 	for(;decimalBytes>=1024.&&cont<unidades.size();cont++){
 		decimalBytes/=1024.;
 	}
@@ -36,12 +36,12 @@ void ControlTabla::addColumn(){
 }
 
 void ControlTabla::addDevices(){
-	int size=this->devices.size();
+	const int size=this->devices.size();
 	int cont;
 	//lista de dispositivos logicos
 	for(cont=0;cont<'Z'-'A'&&cont<size;cont++){
 		ControlTabla::device *device=&this->devices[cont];
-		char id='A'+cont;
+		const char id='A'+cont;
 		std::string deviceName="\\\\.\\";
 		deviceName.push_back(id);
 		deviceName.push_back(':');
@@ -51,11 +51,11 @@ void ControlTabla::addDevices(){
 		device->deviceInfo.reset();
 		device->deviceMeasuring.reset();
 	}
-	int pos=cont;
+	const int pos=cont;
 	//lista de dispostivos fisicos
 	for(;cont<size;cont++){
 		ControlTabla::device *device=&this->devices[cont];
-		char id=cont-pos;
+		const char id=cont-pos;
 		std::string deviceName="\\\\.\\physicaldrive"+std::to_string(id);
 		device->name=deviceName;
 		device->id=id;
@@ -65,7 +65,7 @@ void ControlTabla::addDevices(){
 	}
 }
 
-void ControlTabla::updatePartitionsUnit(ControlTabla::device &device,std::shared_ptr<DeviceInfo> &newDeviceInfo,int fila){
+void ControlTabla::updatePartitionsUnit(ControlTabla::device &device,std::shared_ptr<DeviceInfo> &newDeviceInfo,const int fila){
 	std::string logicalDevicesString;
 	//unidades logicas que son unidades fisicas
 	if(!device.namePhysical&&newDeviceInfo->isPhysical()){
@@ -73,15 +73,16 @@ void ControlTabla::updatePartitionsUnit(ControlTabla::device &device,std::shared
 	//unidades fisicas
 	}else{
 		int contNumberPartitions=0;
-		for(int contDevices,sizeDevices=this->devices.size();contDevices<sizeDevices;contDevices++){
+		const int sizeDevices=this->devices.size();
+		for(int contDevices=0;contDevices<sizeDevices;contDevices++){
 			ControlTabla::device *deviceCont=&this->devices[contDevices];
 			//filtramos los dispositivos logicos
 			if(!deviceCont->namePhysical&&deviceCont->deviceInfo&&!deviceCont->deviceInfo->isPhysical()){
 				const VOLUME_DISK_EXTENTS *partitionsInfo=deviceCont->deviceInfo->getPartitionsInfo().data();
-				int sizePartitions=partitionsInfo->NumberOfDiskExtents;
+				const int sizePartitions=partitionsInfo->NumberOfDiskExtents;
 				//comprovamos que el dispostivo logico pertenezca al ficico y lo añadimos a la fila
 				for(int contPartitions=0;contPartitions<sizePartitions;contPartitions++){
-					if(device.id==partitionsInfo->Extents[contPartitions].DiskNumber){
+					if((DWORD)device.id==partitionsInfo->Extents[contPartitions].DiskNumber){
 						if(contNumberPartitions++)logicalDevicesString.push_back(',');
 						logicalDevicesString.push_back(deviceCont->id);
 					}
@@ -97,8 +98,8 @@ void ControlTabla::modifiyTable(ControlTabla::device &device,std::shared_ptr<Dev
 	int tempContFila=contFila;
 	if(device.deviceInfo&&newDeviceInfo){
 		//un dispostivo fisico siempre es fisico pero uno logico no siempre
-		bool deviceIsPhysical=device.namePhysical||device.deviceInfo->isPhysical();
-		bool newDeviceIsPhysical=device.namePhysical||newDeviceInfo->isPhysical();
+		const bool deviceIsPhysical=device.namePhysical||device.deviceInfo->isPhysical();
+		const bool newDeviceIsPhysical=device.namePhysical||newDeviceInfo->isPhysical();
 		//buscamos cambios en el dispostivo
 		if(deviceIsPhysical!=newDeviceIsPhysical){
 			//creamos o destruimos dependiendo de si ha habiodo una conversion de fisco a logico
@@ -116,7 +117,7 @@ void ControlTabla::modifiyTable(ControlTabla::device &device,std::shared_ptr<Dev
 		this->updatePartitionsUnit(device,newDeviceInfo,contFila);
 	//agregar fila
 	}else if(!device.deviceInfo&&newDeviceInfo){
-		bool newDeviceIsPhysical=device.namePhysical||newDeviceInfo->isPhysical();
+		const bool newDeviceIsPhysical=device.namePhysical||newDeviceInfo->isPhysical();
 		if(newDeviceIsPhysical){
 			this->tabla->agregarFilas(1,contFila);
 			this->tabla->setValor(newDeviceInfo->getProductId(),contFila,ControlTabla::columna::nombre);
@@ -134,10 +135,11 @@ void ControlTabla::modifiyTable(ControlTabla::device &device,std::shared_ptr<Dev
 	contFila=tempContFila;
 }
 
-ControlTabla::device* ControlTabla::getDevice(int fila){
+ControlTabla::device* ControlTabla::getDevice(const int fila){
 	ControlTabla::device *device=NULL;
 	int contFila=0;
-	for(int cont=0,size=this->devices.size();cont<size&&!device;cont++){
+	const int size=this->devices.size();
+	for(int cont=0;cont<size&&!device;cont++){
 		ControlTabla::device *deviceCont=&this->devices[cont];
 		//filtramos los dispositivos fisicos
 		if(deviceCont->namePhysical||(deviceCont->deviceInfo&&deviceCont->deviceInfo->isPhysical())){
@@ -150,11 +152,12 @@ ControlTabla::device* ControlTabla::getDevice(int fila){
 	return device;
 }
 
-bool ControlTabla::errorAsync(DeviceMeasuring *deviceMeasuring,int error,void *param){
+bool ControlTabla::errorAsync(DeviceMeasuring *deviceMeasuring,const int error,void *param){
 	ControlTabla *controlTabla=(ControlTabla*)param;
 	int contFila=0;
 	bool run=true;
-	for(int cont=0,size=controlTabla->devices.size();cont<size&&run;cont++){
+	const int size=controlTabla->devices.size();
+	for(int cont=0;cont<size&&run;cont++){
 		ControlTabla::device *deviceCont=&controlTabla->devices[cont];
 		//filtramos los dispositivos fisicos
 		if(deviceCont->namePhysical||(deviceCont->deviceInfo&&deviceCont->deviceInfo->isPhysical())){
@@ -170,9 +173,9 @@ bool ControlTabla::errorAsync(DeviceMeasuring *deviceMeasuring,int error,void *p
 
 //Constructor
 ControlTabla::ControlTabla(std::shared_ptr<Tabla> &tabla,std::shared_ptr<Ventana> &ventana):
+            devices(100),
 			tabla(tabla),
-			ventana(ventana),
-			devices(100){
+			ventana(ventana){
 	std::clog<<"[ControlTabla] creando dispositivo"<<std::endl;
 	addColumn();
 	addDevices();
@@ -187,7 +190,8 @@ ControlTabla::~ControlTabla(){
 void ControlTabla::updateDevice(){
 	std::clog<<"[ControlTabla] actualizarDispositivos"<<std::endl;
 	int contFila=0;
-	for(int cont=0,size=this->devices.size();cont<size;cont++){
+	const int size=this->devices.size();
+	for(int cont=0;cont<size;cont++){
 		std::shared_ptr<DeviceInfo> deviceUse;
 		try{
 			deviceUse.reset(new DeviceInfo(this->devices[cont].name));
@@ -199,7 +203,7 @@ void ControlTabla::updateDevice(){
 }
 
 //Inicia o detiene la medicion de un dispositivo
-void ControlTabla::setMeasuring(int fila,bool run){
+void ControlTabla::setMeasuring(const int fila,const bool run){
 	std::clog<<"[ControlTabla] establece la medicion\n\tfila: "<<fila<<
 			"\n\trun: "<<run<<std::endl;
 	ControlTabla::device *device=this->getDevice(fila);
@@ -231,8 +235,9 @@ void ControlTabla::setMeasuring(int fila,bool run){
 void ControlTabla::displayMeasuring(){
 	std::clog<<"[ControlTabla] mostrar Medicion"<<std::endl;
 	int contFila=0;
-	for(int cont=0,size=this->devices.size();cont<size;cont++){
-		ControlTabla::device *deviceCont=&this->devices[cont];
+	const int size=this->devices.size();
+	for(int cont=0;cont<size;cont++){
+		const ControlTabla::device *deviceCont=&this->devices[cont];
 		//filtramos los dispositivos fisicos
 		if(deviceCont->namePhysical||(deviceCont->deviceInfo&&deviceCont->deviceInfo->isPhysical())){
 			//mostramos la medida si se esta midiendo
@@ -247,7 +252,7 @@ void ControlTabla::displayMeasuring(){
 				}
 				this->tabla->setValor(ControlTabla::toString(errors,2)+" %",
 						contFila,ControlTabla::columna::porcentajeErrores);
-				
+
 			}
 			contFila++;
 		}
@@ -257,7 +262,8 @@ void ControlTabla::displayMeasuring(){
 void ControlTabla::setMode(DeviceMeasuring::mode mode){
 	std::clog<<"[ControlTabla] estableciendo modo: "<<mode<<std::endl;
 	this->mode=mode;
-	for(int cont=0,size=this->devices.size();cont<size;cont++){
+	const int size=this->devices.size();
+	for(int cont=0;cont<size;cont++){
 		ControlTabla::device *deviceCont=&this->devices[cont];
 		if(deviceCont->deviceMeasuring){
 			deviceCont->deviceMeasuring->setMode(mode);

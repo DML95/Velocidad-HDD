@@ -3,7 +3,7 @@
 
 #include "temporizador.h"
 
-Temporizador::Temporizador(std::shared_ptr<Ventana> &ventana,int tiempo):
+Temporizador::Temporizador(std::shared_ptr<Ventana> &ventana,const int tiempo):
 		ventana(ventana){
 	std::clog<<"[Temporizador] creando tiempo: "<<tiempo<<std::endl;
 	this->hTemporizador=SetTimer(ventana->get(),0,tiempo,0);

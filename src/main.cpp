@@ -5,37 +5,37 @@
 const std::string Main::nameClass="VelocidadHDD";
 std::shared_ptr<Main> Main::main(nullptr);
 
-void Main::messageBoxError(std::string error,int num){
-	std::string texto=error+"\n\nError numero "+std::to_string(num);
+void Main::messageBoxError(std::string error,const int num){
+	const std::string texto=error+"\n\nError numero "+std::to_string(num);
 	std::clog<<"[Error] "<<texto<<std::endl;
 	MessageBox(0,texto.c_str(),"Error",0);
 }
 
-WNDPROC Main::event(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam){
+WNDPROC Main::event(const HWND hWnd,const UINT msg,const WPARAM wParam,const LPARAM lParam){
 	WNDPROC out=(WNDPROC)DefWindowProc(hWnd, msg, wParam, lParam);
 	switch(msg){
 		//Redimension de la ventana
 		case WM_SIZE:{
 			std::clog<<"[Main::evento] WM_SIZE"<<std::endl;
-			std::shared_ptr<Main> mainInstance=Main::getInstance();
+			const std::shared_ptr<Main> mainInstance=Main::getInstance();
 			mainInstance->tabla->setTamano(LOWORD(lParam),HIWORD(lParam));
 			break;
 		}
 		//Evento temporizador
 		case WM_TIMER:{
 			std::srand(std::rand());
-			std::shared_ptr<Main> mainInstance=Main::getInstance();
+			const std::shared_ptr<Main> mainInstance=Main::getInstance();
 			mainInstance->controlTabla->displayMeasuring();
 			break;
 		}
 		//Notificaciones de la tabla
 		case WM_NOTIFY:{
-			NMHDR *header = (NMHDR*)lParam;
-	        NMLISTVIEW *nmlist = (NMLISTVIEW*)lParam;
+			const NMHDR *header = (NMHDR*)lParam;
+	        const NMLISTVIEW *nmlist = (NMLISTVIEW*)lParam;
 	        switch(header->code){
 	        	case LVN_ITEMCHANGED:
 	        		std::clog<<"[Main::evento] WM_NOTIFY\n\tLVN_ITEMCHANGED"<<std::endl;
-					std::shared_ptr<Main> mainInstance=Main::getInstance();
+					const std::shared_ptr<Main> mainInstance=Main::getInstance();
 	        		switch(nmlist->uNewState&LVIS_STATEIMAGEMASK){
 	        			case INDEXTOSTATEIMAGEMASK(BST_CHECKED+1):
 	        				mainInstance->controlTabla->setMeasuring(nmlist->iItem,true);
@@ -49,7 +49,7 @@ WNDPROC Main::event(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam){
 		//eventos del menu
 		case WM_COMMAND:{
 			std::clog<<"[Main::evento] WM_COMMAND"<<std::endl;
-			std::shared_ptr<Main> mainInstance=Main::getInstance();
+			const std::shared_ptr<Main> mainInstance=Main::getInstance();
 			switch(LOWORD(wParam)){
 				case Main::idMenu::exit:
 					mainInstance->ventana->destruir();
@@ -70,18 +70,17 @@ WNDPROC Main::event(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam){
 		//Cambio de dispositivos
 		case WM_DEVICECHANGE:{
 			std::clog<<"[Main::evento] WM_DEVICECHANGE"<<std::endl;
-			PDEV_BROADCAST_HDR lpdb=(PDEV_BROADCAST_HDR)lParam;
 			switch(wParam){
 				case DBT_DEVNODES_CHANGED:
 					std::clog<<"\tDBT_DEVNODES_CHANGED"<<std::endl;
-					std::shared_ptr<Main> mainInstance=Main::getInstance();
+					const std::shared_ptr<Main> mainInstance=Main::getInstance();
 					mainInstance->controlTabla->updateDevice();
 			}
 			break;
 		}
 		case ControlTabla::WM_FORCEENDMEASURING:{
 			std::clog<<"[Main::evento] WM_FORCEENDMEASURING"<<std::endl;
-			std::shared_ptr<Main> mainInstance=Main::getInstance();
+			const std::shared_ptr<Main> mainInstance=Main::getInstance();
 			mainInstance->controlTabla->forceEndMeasuring(wParam,lParam);
 			break;
 		}
@@ -112,18 +111,18 @@ Main::Main(){
 			try{
 				//iniciando menu
 				this->mainMenu=std::make_shared<Menu>();
-				
+
 				//iniciando submenu archivos
 				this->fileMenu=std::make_shared<Menu>();
 				this->fileMenu->add(Main::idMenu::exit,"Salir");
 				this->mainMenu->add(this->fileMenu,"Archivo");
-				
+
 				//iniciando submenu propiedades
 				this->propertiesMenu=std::make_shared<Menu>();
 				this->propertiesMenu->add(Main::idMenu::random,true,"Aleatorio");
 				this->propertiesMenu->add(Main::idMenu::sequential,false,"Secuencial");
 				this->mainMenu->add(this->propertiesMenu,"Propiedades");
-				
+
 			}catch(int e){
 				Main::messageBoxError("Error en incio del nucleo",e);
 				errorNumber=e;
@@ -144,7 +143,7 @@ Main::Main(){
 int Main::messageLoop(){
 	std::clog<<"[Main] Iniciando bucle de mensajes"<<std::endl;
 	MSG msg;
-	HWND hwnd=Main::ventana->get();
+	const HWND hwnd=Main::ventana->get();
 	while(GetMessage(&msg,hwnd,0,0)>0){
 		if(!IsDialogMessage(hwnd,&msg)){
 		    TranslateMessage(&msg);
@@ -160,30 +159,31 @@ int Main::run(){
 	try{
 		//creando ventana
 		this->ventana=std::make_shared<Ventana>(this->clase);
-		
+
 		//agregando menu archivos
 		this->ventana->setMenu(this->mainMenu);
-		
+
 		//iniciando tabla
-		this->tabla=std::make_shared<Tabla>((std::shared_ptr<VentanaAbstract>&)this->ventana);
-		
+		std::shared_ptr<VentanaAbstract> ventanaPadre=this->ventana;
+		this->tabla=std::make_shared<Tabla>(ventanaPadre);
+
 		this->tabla->setEstilos(WS_VISIBLE|WS_CHILD|WS_TABSTOP|LVS_REPORT|LBS_NOTIFY);
 		this->tabla->setEstilosEx(WS_EX_CLIENTEDGE);
 		this->tabla->setEstilosTabla(LVS_EX_FULLROWSELECT|LVS_EX_GRIDLINES|LVS_EX_CHECKBOXES);
 		this->tabla->setPosicion(0,0);
-		
+
 		//iniciando dispositivo
 		this->controlTabla=std::make_shared<ControlTabla>(this->tabla,this->ventana);
 		this->controlTabla->updateDevice();
-		
+
 		//iniciando temporizador
 		Main::temporizador=std::make_shared<Temporizador>(this->ventana,1000);
-		
+
 		//estableciendo parametros ventana
 		this->ventana->setTexto("Velocidad HDD");
 		this->ventana->setEstilos(WS_OVERLAPPEDWINDOW|WS_VISIBLE);
 		this->ventana->setTamano(1200,450);
-		
+
 		//iniciamos el bucle de mensajes
 		out=this->messageLoop();
 	}catch(int e){
@@ -199,17 +199,17 @@ Main::~Main(){
 
 std::shared_ptr<Main>& Main::getInstance(){
 	if(!Main::main){
-		HWND hVentana=FindWindow(Main::nameClass.c_str(),NULL);
+		const HWND hVentana=FindWindow(Main::nameClass.c_str(),NULL);
 		//comprovamos si el programa ya esta ejecutandose
 		if(hVentana){
 			std::clog<<"[Main] Pasando el foco al programa abierto"<<std::endl;
 			SetForegroundWindow(hVentana);
 		}else{
-			std::clog<<"[Main] Creando instancia: "<<(bool)Main::main<<std::endl;
+			std::clog<<"[Main] Creando instancia"<<std::endl;
 			try{
 				Main::main.reset(new Main());
 			}catch(int e){
-				
+
 			}
 		}
 	}
@@ -218,10 +218,9 @@ std::shared_ptr<Main>& Main::getInstance(){
 
 int main(){
 	int out=1;
-	std::shared_ptr<Main> mainInstance=Main::getInstance();
+	const std::shared_ptr<Main> mainInstance=Main::getInstance();
 	if(mainInstance){
 		out=mainInstance->run();
 	}
-	std::cin.get();
 	return out;
 }

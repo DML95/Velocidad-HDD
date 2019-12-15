@@ -5,7 +5,7 @@
 #include "deviceInfo.h"
 
 HANDLE DeviceInfo::init(std::string &device){
-	HANDLE handle=CreateFile(
+	const HANDLE handle=CreateFile(
 			device.c_str(),
 			0,
 			FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,
@@ -19,7 +19,7 @@ HANDLE DeviceInfo::init(std::string &device){
 	return handle;
 }
 
-void DeviceInfo::readStorageDeviceDescriptor(HANDLE handle){
+void DeviceInfo::readStorageDeviceDescriptor(const HANDLE handle){
 	//iniciamos storagePropertyQuery
 	STORAGE_PROPERTY_QUERY storagePropertyQuery;
 	std::memset(&storagePropertyQuery,0,sizeof(STORAGE_PROPERTY_QUERY));
@@ -41,7 +41,7 @@ void DeviceInfo::readStorageDeviceDescriptor(HANDLE handle){
 	}
 }
 
-void DeviceInfo::readPartitionsInfo(HANDLE handle){
+void DeviceInfo::readPartitionsInfo(const HANDLE handle){
 	VOLUME_DISK_EXTENTS volumeDiskExtents;
     unsigned long bytesReturned=0;
     if(DeviceIoControl(handle,IOCTL_VOLUME_GET_VOLUME_DISK_EXTENTS,
@@ -59,11 +59,11 @@ void DeviceInfo::readPartitionsInfo(HANDLE handle){
 	}
 }
 
-DeviceInfo::DeviceInfo(std::string device):
+DeviceInfo::DeviceInfo(std::string &device):
 		device(device),
 		storageDeviceDescriptorBuffer(0),
 		volumeDiskExtentsBuffer(0){
-	HANDLE handle=this->init(device);
+	const HANDLE handle=this->init(device);
 	this->readStorageDeviceDescriptor(handle);
 	this->readPartitionsInfo(handle);
 	CloseHandle(handle);
@@ -95,6 +95,6 @@ const std::vector<VOLUME_DISK_EXTENTS>& DeviceInfo::getPartitionsInfo(){
 
 std::string DeviceInfo::getDosDevice(const std::string &device){
 	char dosDevice[127];
-	int size=QueryDosDevice(device.c_str(),dosDevice,sizeof(dosDevice));
+	const int size=QueryDosDevice(device.c_str(),dosDevice,sizeof(dosDevice));
 	return std::string(dosDevice,size);
 }
