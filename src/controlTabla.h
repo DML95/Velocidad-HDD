@@ -1,8 +1,9 @@
 #ifndef CONTROLTABLA_H
 #define CONTROLTABLA_H
 
-	#include <windows.h>
 	#include<vector>
+
+	#include "winapi.h"
 
 	#include "tabla.h"
 	#include "ventana.h"

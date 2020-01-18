@@ -1,9 +1,10 @@
 #ifndef VENTANA_H
 #define VENTANA_H
 
-	#include<windows.h>
 	#include<string>
 	#include<memory>
+
+    #include "winapi.h"
 
 	#include "ventanaAbstract.h"
 	#include "clase.h"

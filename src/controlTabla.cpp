@@ -175,7 +175,8 @@ bool ControlTabla::errorAsync(DeviceMeasuring *deviceMeasuring,const int error,v
 ControlTabla::ControlTabla(std::shared_ptr<Tabla> &tabla,std::shared_ptr<Ventana> &ventana):
             devices(100),
 			tabla(tabla),
-			ventana(ventana){
+			ventana(ventana),
+			mode(DeviceMeasuring::mode::random){
 	std::clog<<"[ControlTabla] creando dispositivo"<<std::endl;
 	addColumn();
 	addDevices();

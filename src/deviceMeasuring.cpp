@@ -14,10 +14,10 @@ void DeviceMeasuring::mainThread(DeviceMeasuring *deviceMeasuring){
 	DWORD size;
 	std::vector<char> buffer(deviceMeasuring->sizeSector);
 	Overlappeds overlappeds;
-	deviceMeasuring->run.exchange(true);
+	deviceMeasuring->run.store(true);
 	//se crean operaciones asincronas hasta la destruccion de la clase
-	for(HANDLE handleTemp=deviceMeasuring->handle;handleTemp&&deviceMeasuring->run;handleTemp=deviceMeasuring->handle){
-		deviceMeasuring->getSector(sector,deviceMeasuring->numberSectors);
+	for(HANDLE handleTemp=deviceMeasuring->handle;handleTemp&&deviceMeasuring->run.load();handleTemp=deviceMeasuring->handle.load()){
+        ((getSector)(deviceMeasuring->getSectorPtr.load()))(sector,deviceMeasuring->numberSectors);
 		OVERLAPPED *overlapped=overlappeds.wait(false);
 		if(overlapped){
 			//comprueva la operacion si el overlapped ha sido iniciado
@@ -33,7 +33,7 @@ void DeviceMeasuring::mainThread(DeviceMeasuring *deviceMeasuring){
 							break;
 						//gestion de error manual
 						default:
-							deviceMeasuring->run.exchange(deviceMeasuring->errorAsync(deviceMeasuring,error,deviceMeasuring->paramError));
+							deviceMeasuring->run.store(deviceMeasuring->errorAsync(deviceMeasuring,error,deviceMeasuring->paramError));
 					}
 				}
 			}
@@ -48,7 +48,7 @@ void DeviceMeasuring::mainThread(DeviceMeasuring *deviceMeasuring){
 						break;
 					//gestion de error manual
 					default:
-						deviceMeasuring->run.exchange(deviceMeasuring->errorAsync(deviceMeasuring,error,deviceMeasuring->paramError));
+						deviceMeasuring->run.store(deviceMeasuring->errorAsync(deviceMeasuring,error,deviceMeasuring->paramError));
 				}
 			}
 		}
@@ -63,7 +63,7 @@ void DeviceMeasuring::getRandonSector(long long &selectSector,const long long nu
 		out|=std::rand();
 		out<<=16;
 	}
-	selectSector=out%numberSectors;
+    selectSector=numberSectors?out%numberSectors:0;
 }
 
 void DeviceMeasuring::getSequentialSector(long long &selectSector,const long long numberSectors){
@@ -109,20 +109,26 @@ DeviceMeasuring::DeviceMeasuring(std::shared_ptr<DeviceInfo> &deviceInfo,DeviceM
 	std::clog<<"[DeviceMeasuring: '"<<name<<"' ] creando medicion"<<std::endl;
 	this->errorAsync=errorAsync;
 	this->paramError=paramError;
-	this->run=false;
-	this->operations=0l;
-	this->errors=0l;
+	this->run.store(false);
+	this->operations.store(0l);
+	this->errors.store(0l);
 	this->setMode(mode);
 	this->init(name);
 	this->readGeometryInfo();
-	this->thread=std::thread(DeviceMeasuring::mainThread,this);
+	if(!(this->numberSectors&&this->sizeSector)){
+	    std::clog<<"[DeviceMeasuring: '"<<name<<"' ] geometria invalida"<<std::endl;
+        CloseHandle(this->handle.load());
+		throw 0;
+	}
+	this->thread=CreateThread(NULL,0,(LPTHREAD_START_ROUTINE)DeviceMeasuring::mainThread,this,0,NULL);
 }
 
 DeviceMeasuring::~DeviceMeasuring(){
 	std::clog<<"[DeviceMeasuring: '"<<this->deviceInfo->get()<<"' ] eliminado medicion"<<std::endl;
 	const HANDLE handleTemp=this->handle.exchange(0);
 	CancelIo(handleTemp);
-	this->thread.join();
+	WaitForSingleObject(this->thread,INFINITE);
+	CloseHandle(this->thread);
 	CloseHandle(handleTemp);
 }
 
@@ -137,11 +143,13 @@ void DeviceMeasuring::setMode(const DeviceMeasuring::mode mode){
 	std::clog<<"[DeviceMeasuring: '"<<this->deviceInfo->get()<<"' ] modificando modo: "<<mode<<std::endl;
 	switch(mode){
 		case DeviceMeasuring::mode::random:
-			this->getSector.exchange(DeviceMeasuring::getRandonSector);
+			this->getSectorPtr.store((void*)DeviceMeasuring::getRandonSector);
 			break;
 		case DeviceMeasuring::mode::sequential:
-			this->getSector.exchange(DeviceMeasuring::getSequentialSector);
+			this->getSectorPtr.store((void*)DeviceMeasuring::getSequentialSector);
 			break;
+        default:
+            std::clog<<"[DeviceMeasuring: '"<<this->deviceInfo->get()<<"' ] error al modificar modo: "<<mode<<std::endl;
 	}
 }
 

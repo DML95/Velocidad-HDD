@@ -1,8 +1,10 @@
 #ifndef CLASE_H
 #define CLASE_H
-	
+
+	#include "winapi.h"
+
 	#include <string>
-	
+
 	//crea una clase de windows
 	class Clase{
 		private:

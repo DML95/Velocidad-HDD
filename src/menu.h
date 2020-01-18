@@ -1,15 +1,16 @@
 #ifndef MENU_H
 #define MENU_H
-	
-	#include<windows.h>
-	#include<vector>
+
+	#include <vector>
 	#include <memory>
-	
+
+	#include "winapi.h"
+
 	class Menu{
 		private:
 			std::vector<std::shared_ptr<Menu> > subMenus;
 			HMENU menu;
-			
+
 		public:
 			//constructor
 			Menu();
@@ -24,5 +25,5 @@
 			//devuelve el identificador nativo del menu
 			HMENU get();
 	};
-	
+
 #endif

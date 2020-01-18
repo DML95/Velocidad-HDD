@@ -3,7 +3,8 @@
 
 	#include<string>
 	#include<vector>
-	#include <windows.h>
+
+	#include "winapi.h"
 
 	//optine informacion del dispositivo
 	class DeviceInfo{

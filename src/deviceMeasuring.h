@@ -5,7 +5,8 @@
 	#include <memory>
 	#include <string>
 	#include <thread>
-	#include <windows.h>
+
+	#include "winapi.h"
 
 	#include "deviceInfo.h"
 
@@ -13,16 +14,18 @@
 	class DeviceMeasuring{
 		private:
 
+            typedef void (*getSector)(long long&,long long);
+
 			std::shared_ptr<DeviceInfo> deviceInfo;
 			std::atomic_bool run;
 			std::atomic<HANDLE> handle;
 			std::atomic_int operations;
 			std::atomic_int errors;
-			std::atomic<void(*)(long long&,long long)> getSector;
+			std::atomic<void*> getSectorPtr;
 
 			bool (*errorAsync)(DeviceMeasuring*,int,void*);
 			void *paramError;
-			std::thread thread;
+			HANDLE thread;
 			unsigned int sizeSector;
 			unsigned long long numberSectors;
 

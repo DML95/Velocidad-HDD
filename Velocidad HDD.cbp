@@ -41,7 +41,11 @@
 		</Build>
 		<Compiler>
 			<Add option="-Wall" />
+			<Add option="-std=c++11" />
 		</Compiler>
+		<Linker>
+			<Add option="-static" />
+		</Linker>
 		<Unit filename="src/clase.cpp" />
 		<Unit filename="src/clase.h" />
 		<Unit filename="src/controlTabla.cpp" />
@@ -66,7 +70,7 @@
 		<Unit filename="src/ventana.h" />
 		<Unit filename="src/ventanaAbstract.cpp" />
 		<Unit filename="src/ventanaAbstract.h" />
-		<Unit filename="src/wait.h" />
+		<Unit filename="src/winapi.h" />
 		<Extensions>
 			<code_completion />
 			<envvars />

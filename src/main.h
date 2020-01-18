@@ -3,10 +3,9 @@
 
 	#include<cstdio>
 	#include<string>
-	#include <windows.h>
-	#include <dbt.h>
-	#include <commctrl.h>
 	#include <memory>
+
+    #include "winapi.h"
 
 	#include "temporizador.h"
 	#include "controlesEspeciales.h"

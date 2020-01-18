@@ -18,7 +18,9 @@ WNDPROC Main::event(const HWND hWnd,const UINT msg,const WPARAM wParam,const LPA
 		case WM_SIZE:{
 			std::clog<<"[Main::evento] WM_SIZE"<<std::endl;
 			const std::shared_ptr<Main> mainInstance=Main::getInstance();
-			mainInstance->tabla->setTamano(LOWORD(lParam),HIWORD(lParam));
+			if(mainInstance->tabla){
+                mainInstance->tabla->setTamano(LOWORD(lParam),HIWORD(lParam));
+			}
 			break;
 		}
 		//Evento temporizador

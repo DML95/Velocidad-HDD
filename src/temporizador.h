@@ -1,8 +1,10 @@
 #ifndef TEMPORIZADOR_H
 #define TEMPORIZADOR_H
-	
+
+	#include "winapi.h"
+
 	#include "ventana.h"
-	
+
 	//crea eventos de temporizacion enviados a una ventana de windows
 	class Temporizador{
 		private:
@@ -11,7 +13,7 @@
 		public:
 			//Constructor
 			Temporizador(std::shared_ptr<Ventana> &ventana,int tiempo);
-			
+
 			//Destructor
 			~Temporizador();
 	};

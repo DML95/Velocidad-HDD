@@ -1,4 +1,4 @@
-#include <securitybaseapi.h>
+//#include <securitybaseapi.h>
 #include <iostream>
 #include <cstring>
 

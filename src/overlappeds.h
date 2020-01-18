@@ -1,8 +1,9 @@
 #ifndef OVERLAPPEDS_H
 #define OVERLAPPEDS_H
 
-	#include<windows.h>
 	#include<vector>
+
+    #include "winapi.h"
 
 	class Overlappeds{
 		private:
