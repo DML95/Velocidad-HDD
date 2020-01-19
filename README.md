@@ -4,6 +4,6 @@ Aplicación para determinar la velocidad de discos duros y otras unidades median
 
 [Descargar programa](https://github.com/DML95/Velocidad-HDD/raw/master/bin/Velocidad%20HDD.exe) (Requiere modo administrador para funcionar bien)
 
-* Copilador -> CPP (mingw-w64)
+* Copilador -> GCC (mingw-w64)
 * IDE -> Code::Blocks
 * Sistema Opertivo -> Windows

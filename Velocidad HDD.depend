@@ -141,23 +141,23 @@
 	<iostream>
 	"wait.h"
 
-1576319858 source:c:\users\david-pc\documents\programas\c++\programas\velocidad hdd\src\clase.cpp
+1579349426 source:c:\users\david-pc\documents\programas\c++\programas\velocidad hdd\src\clase.cpp
 	<windows.h>
 	<iostream>
 	"clase.h"
 
-1578756322 c:\users\david-pc\documents\programas\c++\programas\velocidad hdd\src\clase.h
+1579349426 c:\users\david-pc\documents\programas\c++\programas\velocidad hdd\src\clase.h
 	"winapi.h"
 	<string>
 
-1578337806 source:c:\users\david-pc\documents\programas\c++\programas\velocidad hdd\src\controlesespeciales.cpp
+1579349426 source:c:\users\david-pc\documents\programas\c++\programas\velocidad hdd\src\controlesespeciales.cpp
 	<iostream>
 	"controlesEspeciales.h"
 
-1578756338 c:\users\david-pc\documents\programas\c++\programas\velocidad hdd\src\controlesespeciales.h
+1579349426 c:\users\david-pc\documents\programas\c++\programas\velocidad hdd\src\controlesespeciales.h
 	"winapi.h"
 
-1578830456 source:c:\users\david-pc\documents\programas\c++\programas\velocidad hdd\src\controltabla.cpp
+1579349426 source:c:\users\david-pc\documents\programas\c++\programas\velocidad hdd\src\controltabla.cpp
 	<cstdio>
 	<iostream>
 	<iomanip>
@@ -177,14 +177,14 @@
 	<string>
 	"ventanaAbstract.h"
 
-1578756503 c:\users\david-pc\documents\programas\c++\programas\velocidad hdd\src\ventanaabstract.h
+1579349426 c:\users\david-pc\documents\programas\c++\programas\velocidad hdd\src\ventanaabstract.h
 	<string>
 	<memory>
 	"winapi.h"
 	"clase.h"
 	"menu.h"
 
-1578756426 c:\users\david-pc\documents\programas\c++\programas\velocidad hdd\src\menu.h
+1579349426 c:\users\david-pc\documents\programas\c++\programas\velocidad hdd\src\menu.h
 	<vector>
 	<memory>
 	"winapi.h"
@@ -197,12 +197,12 @@
 	"clase.h"
 	"menu.h"
 
-1578756393 c:\users\david-pc\documents\programas\c++\programas\velocidad hdd\src\deviceinfo.h
+1579349426 c:\users\david-pc\documents\programas\c++\programas\velocidad hdd\src\deviceinfo.h
 	<string>
 	<vector>
 	"winapi.h"
 
-1579344001 c:\users\david-pc\documents\programas\c++\programas\velocidad hdd\src\devicemeasuring.h
+1579349426 c:\users\david-pc\documents\programas\c++\programas\velocidad hdd\src\devicemeasuring.h
 	<atomic>
 	<memory>
 	<string>
@@ -210,7 +210,7 @@
 	"winapi.h"
 	"deviceInfo.h"
 
-1578338350 source:c:\users\david-pc\documents\programas\c++\programas\velocidad hdd\src\deviceinfo.cpp
+1579349426 source:c:\users\david-pc\documents\programas\c++\programas\velocidad hdd\src\deviceinfo.cpp
 	<iostream>
 	<cstring>
 	"deviceInfo.h"
@@ -272,7 +272,7 @@
 	<iostream>
 	"ventanaAbstract.h"
 
-1579348159 c:\users\david-pc\documents\programas\c++\programas\velocidad hdd\src\winapi.h
+1579349426 c:\users\david-pc\documents\programas\c++\programas\velocidad hdd\src\winapi.h
 	<windows.h>
 	<dbt.h>
 	<commctrl.h>
