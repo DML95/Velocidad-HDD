@@ -41,8 +41,11 @@
 
 			//abre el dispositivo
 			void init(std::string &device);
-			//lee la informacion de la extructura fisica del disco
+			//lee la informacion de la extructura logica del disco
 			void readGeometryInfo();
+			//lee la informacion del tamaÃ±o fisico de los sectores
+			//llamar siempre despues de readGeometryInfo()
+			void readAccessAlignmentInfo();
 
 		public:
 
@@ -65,7 +68,7 @@
 			void getMeasuringAndReset(DeviceMeasuring::measuring &measuring);
 			//establece el modo de lectura
 			void setMode(DeviceMeasuring::mode mode);
-			//devualve el tamño del dispostivo
+			//devualve el tamï¿½o del dispostivo
 			long long getSize();
 	};
 

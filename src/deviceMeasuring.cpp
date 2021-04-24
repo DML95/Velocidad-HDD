@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cstring>
 
 #include "deviceMeasuring.h"
 #include "overlappeds.h"
@@ -99,8 +100,27 @@ void DeviceMeasuring::readGeometryInfo(){
 		this->numberSectors=0l;
 		this->sizeSector=0;
 	}
-	std::clog<<"[DeviceMeasuring: '"<<this->deviceInfo->get()<<"' ] leyendo estructura del dispostivo\n\tnumero de sectores: "<<this->numberSectors<<
-			"\n\ttama�o del sector: "<<this->sizeSector<<std::endl;
+	std::clog<<"[DeviceMeasuring: '"<<this->deviceInfo->get()<<"' ] leyendo estructura logica del dispostivo\n\tnumero de sectores: "<<this->numberSectors<<
+			"\n\ttamaño del sector: "<<this->sizeSector<<std::endl;
+}
+
+void DeviceMeasuring::readAccessAlignmentInfo(){
+	STORAGE_PROPERTY_QUERY queryDisk;
+	std::memset(&queryDisk, 0, sizeof(STORAGE_PROPERTY_QUERY));
+	queryDisk.PropertyId=STORAGE_PROPERTY_ID::StorageAccessAlignmentProperty;
+	queryDisk.QueryType=STORAGE_QUERY_TYPE::PropertyStandardQuery;
+	STORAGE_ACCESS_ALIGNMENT_DESCRIPTOR alignmentDisk;
+	unsigned long bytesReturned=0;
+	if(DeviceIoControl(this->handle,IOCTL_STORAGE_QUERY_PROPERTY,
+			&queryDisk,sizeof(STORAGE_PROPERTY_QUERY),
+			&alignmentDisk,sizeof(STORAGE_ACCESS_ALIGNMENT_DESCRIPTOR),&bytesReturned,NULL)){
+		if(this->sizeSector==alignmentDisk.BytesPerLogicalSector){
+			this->numberSectors/=alignmentDisk.BytesPerPhysicalSector/this->sizeSector;
+			this->sizeSector=alignmentDisk.BytesPerPhysicalSector;
+		}
+	}
+	std::clog<<"[DeviceMeasuring: '"<<this->deviceInfo->get()<<"' ] leyendo estructura fisica del dispostivo\n\tnumero de sectores: "<<this->numberSectors<<
+				"\n\ttamaño del sector: "<<this->sizeSector<<std::endl;
 }
 
 DeviceMeasuring::DeviceMeasuring(std::shared_ptr<DeviceInfo> &deviceInfo,DeviceMeasuring::mode mode,bool (*errorAsync)(DeviceMeasuring*,int,void*),void *paramError):
@@ -119,6 +139,8 @@ DeviceMeasuring::DeviceMeasuring(std::shared_ptr<DeviceInfo> &deviceInfo,DeviceM
 	    std::clog<<"[DeviceMeasuring: '"<<name<<"' ] geometria invalida"<<std::endl;
         CloseHandle(this->handle.load());
 		throw 0;
+	}else{
+		this->readAccessAlignmentInfo();
 	}
 	this->thread=CreateThread(NULL,0,(LPTHREAD_START_ROUTINE)DeviceMeasuring::mainThread,this,0,NULL);
 }
