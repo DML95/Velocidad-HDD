@@ -80,7 +80,7 @@ void ControlTabla::updatePartitionsUnit(ControlTabla::device &device,std::shared
 			if(!deviceCont->namePhysical&&deviceCont->deviceInfo&&!deviceCont->deviceInfo->isPhysical()){
 				const VOLUME_DISK_EXTENTS *partitionsInfo=deviceCont->deviceInfo->getPartitionsInfo().data();
 				const int sizePartitions=partitionsInfo->NumberOfDiskExtents;
-				//comprovamos que el dispostivo logico pertenezca al ficico y lo añadimos a la fila
+				//comprovamos que el dispostivo logico pertenezca al ficico y lo aï¿½adimos a la fila
 				for(int contPartitions=0;contPartitions<sizePartitions;contPartitions++){
 					if((DWORD)device.id==partitionsInfo->Extents[contPartitions].DiskNumber){
 						if(contNumberPartitions++)logicalDevicesString.push_back(',');
@@ -152,7 +152,7 @@ ControlTabla::device* ControlTabla::getDevice(const int fila){
 	return device;
 }
 
-bool ControlTabla::errorAsync(DeviceMeasuring *deviceMeasuring,const int error,void *param){
+bool ControlTabla::errorAsync(DeviceMeasuring &deviceMeasuring,const int error,void *param){
 	ControlTabla *controlTabla=(ControlTabla*)param;
 	int contFila=0;
 	bool run=true;
@@ -161,7 +161,7 @@ bool ControlTabla::errorAsync(DeviceMeasuring *deviceMeasuring,const int error,v
 		ControlTabla::device *deviceCont=&controlTabla->devices[cont];
 		//filtramos los dispositivos fisicos
 		if(deviceCont->namePhysical||(deviceCont->deviceInfo&&deviceCont->deviceInfo->isPhysical())){
-			if(deviceCont->deviceMeasuring.get()==deviceMeasuring){
+			if(deviceCont->deviceMeasuring.get()==&deviceMeasuring){
 				controlTabla->ventana->postMessage(ControlTabla::WM_FORCEENDMEASURING,contFila,error);
 				run=false;
 			}
@@ -221,7 +221,7 @@ void ControlTabla::setMeasuring(const int fila,const bool run){
 					error="Acceso denegado";
 					break;
 				default:
-					error="El dispositivo no está listo";
+					error="El dispositivo no estÃ¡ listo";
 			}
 			this->tabla->setChecked(fila,false);
 		}

@@ -14,7 +14,12 @@
 	class DeviceMeasuring{
 		private:
 
-            typedef void (*getSector)(long long&,long long);
+			typedef struct{
+				unsigned long long sector;
+				unsigned int sizeBlock;
+			}InfoRead;
+
+            typedef void (*getSector)(InfoRead&,DeviceMeasuring&);
 
 			std::shared_ptr<DeviceInfo> deviceInfo;
 			std::atomic_bool run;
@@ -22,22 +27,24 @@
 			std::atomic_int operations;
 			std::atomic_int errors;
 			std::atomic<void*> getSectorPtr;
+			//std::atomic_uint sizeBlock;
 
-			bool (*errorAsync)(DeviceMeasuring*,int,void*);
+			bool (*errorAsync)(DeviceMeasuring&,int,void*);
 			void *paramError;
 			HANDLE thread;
 			unsigned int sizeSector;
 			unsigned long long numberSectors;
+			unsigned int sequentialSizeBlock;
 
 			//lee de manera asincrona un registro
-			static bool readSector(std::vector<char> &buffer,OVERLAPPED *overlapped,DeviceMeasuring *deviceMeasuring);
+			static bool readSector(std::vector<char> &buffer,OVERLAPPED *overlapped,DeviceMeasuring &deviceMeasuring,InfoRead &infoRead);
 			//hilo en segundo plano que realiza la medicion
-			static void mainThread(DeviceMeasuring *deviceMeasuring);
+			static void mainThread(DeviceMeasuring &deviceMeasuring);
 
 			//funcion que devulave un sector aleatorio
-			static void getRandonSector(long long &selectSector,long long numberSectors);
+			static void getRandonSector(InfoRead &infoRead,DeviceMeasuring &deviceMeasuring);
 			//funcion que devuelve un sector secuencial
-			static void getSequentialSector(long long &selectSector,long long numberSectors);
+			static void getSequentialSector(InfoRead &infoRead,DeviceMeasuring &deviceMeasuring);
 
 			//abre el dispositivo
 			void init(std::string &device);
@@ -46,6 +53,9 @@
 			//lee la informacion del tamaño fisico de los sectores
 			//llamar siempre despues de readGeometryInfo()
 			void readAccessAlignmentInfo();
+			//optiene un numero de sectores mas grande para la lectura secuancial
+			//en las lecturas secuanciales se tiene que leer un bloque de sectores para saturar el disco
+			void getSequentialSizeBlock();
 
 		public:
 
@@ -61,7 +71,7 @@
 			};
 
 			//constructor
-			DeviceMeasuring(std::shared_ptr<DeviceInfo> &deviceInfo,DeviceMeasuring::mode mode,bool (*errorAsync)(DeviceMeasuring*,int,void*),void *paramError);
+			DeviceMeasuring(std::shared_ptr<DeviceInfo> &deviceInfo,DeviceMeasuring::mode mode,bool (*errorAsync)(DeviceMeasuring&,int,void*),void *paramError);
 			//destructor
 			~DeviceMeasuring();
 			//optiene la medicion y reinia el contador

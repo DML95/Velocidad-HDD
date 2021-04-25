@@ -1,9 +1,11 @@
 #include "overlappeds.h"
 
+#define WAIT_OBJECTS MAXIMUM_WAIT_OBJECTS/2
+
 Overlappeds::Overlappeds():
-		events(MAXIMUM_WAIT_OBJECTS),
-		overlappeds(MAXIMUM_WAIT_OBJECTS){
-	for(int cont=0;cont<MAXIMUM_WAIT_OBJECTS;++cont){
+		events(WAIT_OBJECTS),
+		overlappeds(WAIT_OBJECTS){
+	for(int cont=0;cont<WAIT_OBJECTS;++cont){
 		const HANDLE event=CreateEvent(NULL,true,true,NULL);
 		events[cont]=event;
 		OVERLAPPED *overlapped=&overlappeds[cont];
@@ -13,7 +15,7 @@ Overlappeds::Overlappeds():
 }
 
 Overlappeds::~Overlappeds(){
-	for(int cont=0;cont<MAXIMUM_WAIT_OBJECTS;++cont){
+	for(int cont=0;cont<WAIT_OBJECTS;++cont){
 		CloseHandle(events[cont]);
 	}
 }

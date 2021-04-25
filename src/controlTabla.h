@@ -57,7 +57,7 @@
 			//devuelve el dispositivo a partir de la fila de la tabla
 			ControlTabla::device* getDevice(int fila);
 			//funcion llamada cuando se genera un error en alguna medicion
-			static bool errorAsync(DeviceMeasuring *deviceMeasuring,int error,void *param);
+			static bool errorAsync(DeviceMeasuring &deviceMeasuring,int error,void *param);
 
 		public:
 

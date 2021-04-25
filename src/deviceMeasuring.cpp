@@ -3,45 +3,47 @@
 
 #include "deviceMeasuring.h"
 #include "overlappeds.h"
+#include "utils.h"
 
-bool DeviceMeasuring::readSector(std::vector<char> &buffer,OVERLAPPED *overlapped,DeviceMeasuring *deviceMeasuring){
-	return ReadFile(deviceMeasuring->handle,buffer.data(),deviceMeasuring->sizeSector,NULL,overlapped);
+bool DeviceMeasuring::readSector(std::vector<char> &buffer,OVERLAPPED *overlapped,DeviceMeasuring &deviceMeasuring,InfoRead &infoRead){
+	overlapped->Pointer=(PVOID)(infoRead.sector*deviceMeasuring.sizeSector);
+	return ReadFile(deviceMeasuring.handle,buffer.data(),deviceMeasuring.sizeSector*infoRead.sizeBlock,NULL,overlapped);
 }
 
-void DeviceMeasuring::mainThread(DeviceMeasuring *deviceMeasuring){
-	const std::string name=deviceMeasuring->deviceInfo->get();
+void DeviceMeasuring::mainThread(DeviceMeasuring &deviceMeasuring){
+	const std::string name=deviceMeasuring.deviceInfo->get();
 	std::clog<<"[DeviceMeasuring: '"<<name<<"' ] iniciando hilo"<<std::endl;
-	long long sector=0;
+	InfoRead infoRead;
 	DWORD size;
-	std::vector<char> buffer(deviceMeasuring->sizeSector);
+	std::vector<char> buffer(deviceMeasuring.sizeSector*deviceMeasuring.sequentialSizeBlock);
 	Overlappeds overlappeds;
-	deviceMeasuring->run.store(true);
+	deviceMeasuring.run.store(true);
 	//se crean operaciones asincronas hasta la destruccion de la clase
-	for(HANDLE handleTemp=deviceMeasuring->handle;handleTemp&&deviceMeasuring->run.load();handleTemp=deviceMeasuring->handle.load()){
-        ((getSector)(deviceMeasuring->getSectorPtr.load()))(sector,deviceMeasuring->numberSectors);
+	for(HANDLE handleTemp=deviceMeasuring.handle.load();handleTemp&&deviceMeasuring.run.load();handleTemp=deviceMeasuring.handle.load()){
+        ((getSector)(deviceMeasuring.getSectorPtr.load()))(infoRead,deviceMeasuring);
 		OVERLAPPED *overlapped=overlappeds.wait(false);
 		if(overlapped){
 			//comprueva la operacion si el overlapped ha sido iniciado
 			if(overlapped->Pointer){
-				if(GetOverlappedResult(deviceMeasuring->handle,overlapped,&size,false)){
-					deviceMeasuring->operations.fetch_add(1);
+				if(GetOverlappedResult(deviceMeasuring.handle,overlapped,&size,false)){
+					deviceMeasuring.operations.fetch_add(infoRead.sizeBlock);
 				}else{
 					const int error=GetLastError();
 					switch(error){
 						//error en sector
 						case ERROR_CRC:
-							deviceMeasuring->errors.fetch_add(1);
+							deviceMeasuring.errors.fetch_add(infoRead.sizeBlock);
 							break;
 						//gestion de error manual
 						default:
-							deviceMeasuring->run.store(deviceMeasuring->errorAsync(deviceMeasuring,error,deviceMeasuring->paramError));
+							deviceMeasuring.run.store(deviceMeasuring.errorAsync(deviceMeasuring,error,deviceMeasuring.paramError));
 					}
 				}
 			}
-			overlapped->Pointer=(PVOID)(sector*deviceMeasuring->sizeSector);
+			//overlapped->Pointer=(PVOID)(infoRead.sector*deviceMeasuring.sizeSector);
 			overlapped->Internal=0;
 			overlapped->InternalHigh=0;
-			if(DeviceMeasuring::readSector(buffer,overlapped,deviceMeasuring)){
+			if(DeviceMeasuring::readSector(buffer,overlapped,deviceMeasuring,infoRead)){
 				const int error=GetLastError();
 				switch(error){
 					//no es un error
@@ -49,7 +51,7 @@ void DeviceMeasuring::mainThread(DeviceMeasuring *deviceMeasuring){
 						break;
 					//gestion de error manual
 					default:
-						deviceMeasuring->run.store(deviceMeasuring->errorAsync(deviceMeasuring,error,deviceMeasuring->paramError));
+						deviceMeasuring.run.store(deviceMeasuring.errorAsync(deviceMeasuring,error,deviceMeasuring.paramError));
 				}
 			}
 		}
@@ -58,20 +60,26 @@ void DeviceMeasuring::mainThread(DeviceMeasuring *deviceMeasuring){
 	std::clog<<"[DeviceMeasuring: '"<<name<<"' ] finalizando hilo"<<std::endl;
 }
 
-void DeviceMeasuring::getRandonSector(long long &selectSector,const long long numberSectors){
-	long long out=0;
-	for(int cont=0;cont<4&&out<numberSectors;cont++){
+void DeviceMeasuring::getRandonSector(InfoRead &infoRead,DeviceMeasuring &deviceMeasuring){
+	unsigned long long out=0;
+	for(int cont=0;cont<4&&out<deviceMeasuring.numberSectors;cont++){
 		out|=std::rand();
 		out<<=16;
 	}
-    selectSector=numberSectors?out%numberSectors:0;
+	infoRead.sector=deviceMeasuring.numberSectors?out%deviceMeasuring.numberSectors:0;
+	infoRead.sizeBlock=1;
 }
 
-void DeviceMeasuring::getSequentialSector(long long &selectSector,const long long numberSectors){
-	selectSector++;
-	if(selectSector>numberSectors){
-		selectSector=0l;
+void DeviceMeasuring::getSequentialSector(InfoRead &infoRead,DeviceMeasuring &deviceMeasuring){
+	//seleccionamos un sector multiplo de sequentialSizeBlock
+	while(infoRead.sector%deviceMeasuring.sequentialSizeBlock!=0){
+		infoRead.sector++;
 	}
+	infoRead.sector+=deviceMeasuring.sequentialSizeBlock;
+	if(infoRead.sector>deviceMeasuring.numberSectors){
+		infoRead.sector=0l;
+	}
+	infoRead.sizeBlock=deviceMeasuring.sequentialSizeBlock;
 }
 
 void DeviceMeasuring::init(std::string &device){
@@ -123,7 +131,17 @@ void DeviceMeasuring::readAccessAlignmentInfo(){
 				"\n\ttamaño del sector: "<<this->sizeSector<<std::endl;
 }
 
-DeviceMeasuring::DeviceMeasuring(std::shared_ptr<DeviceInfo> &deviceInfo,DeviceMeasuring::mode mode,bool (*errorAsync)(DeviceMeasuring*,int,void*),void *paramError):
+void DeviceMeasuring::getSequentialSizeBlock(){
+	//usamos el logaritmo en base 2 para evitar que en los discos grandes el tamño de bloque sea demasiado grande y en los pequeños demasiado pequeno
+	this->sequentialSizeBlock=Utils::log2(this->numberSectors);
+	//buscamos el tamaño de bloque mas cercano por abajo que sea multiplo exacto de los sectores del dispositivo
+	//se hace para enviar pasarnos o quedarnos cortos al final del disco
+	while(this->numberSectors%this->sequentialSizeBlock!=0) {
+		this->sequentialSizeBlock--;
+	}
+}
+
+DeviceMeasuring::DeviceMeasuring(std::shared_ptr<DeviceInfo> &deviceInfo,DeviceMeasuring::mode mode,bool (*errorAsync)(DeviceMeasuring&,int,void*),void *paramError):
 		deviceInfo(deviceInfo){
 	std::string name=this->deviceInfo->get();
 	std::clog<<"[DeviceMeasuring: '"<<name<<"' ] creando medicion"<<std::endl;
@@ -139,10 +157,10 @@ DeviceMeasuring::DeviceMeasuring(std::shared_ptr<DeviceInfo> &deviceInfo,DeviceM
 	    std::clog<<"[DeviceMeasuring: '"<<name<<"' ] geometria invalida"<<std::endl;
         CloseHandle(this->handle.load());
 		throw 0;
-	}else{
-		this->readAccessAlignmentInfo();
 	}
-	this->thread=CreateThread(NULL,0,(LPTHREAD_START_ROUTINE)DeviceMeasuring::mainThread,this,0,NULL);
+	this->readAccessAlignmentInfo();
+	this->getSequentialSizeBlock();
+	this->thread=CreateThread(NULL,0,(LPTHREAD_START_ROUTINE)DeviceMeasuring::mainThread,(LPVOID)this,0,NULL);
 }
 
 DeviceMeasuring::~DeviceMeasuring(){
