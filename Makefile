@@ -2,7 +2,7 @@
 
 CXX=g++
 CXXFLAGS=-O3 -std=c++17 -Wall
-LDFLAGS=-static-libstdc++ -static-libgcc
+LDFLAGS=-static
 
 DIRSRC = src
 DIROBJ = obj
@@ -78,5 +78,5 @@ $(DIROBJ)/%.o: $(DIRSRC)/%.cpp
 	$(CXX) -o $@ -c $< $(CXXFLAGS) -I$(DIRSRC)
 
 #limpiamos los archivos antiguos
-clean: $(DIROBJ) $(DIRDEP) $(FILE_BIN)
-	$(call RM_OS,$^)
+clean:
+	$(call RM_OS,$(DIROBJ) $(DIRDEP) $(FILE_BIN))
