@@ -9,6 +9,7 @@
 	#include "winapi.h"
 
 	#include "deviceInfo.h"
+	#include "random.h"
 
 	//inicia la medicion
 	class DeviceMeasuring{
@@ -27,6 +28,7 @@
 			std::atomic_int operations;
 			std::atomic_int errors;
 			std::atomic<void*> getSectorPtr;
+			Random randomGen;
 			//std::atomic_uint sizeBlock;
 
 			bool (*errorAsync)(DeviceMeasuring&,int,void*);
@@ -41,8 +43,8 @@
 			//hilo en segundo plano que realiza la medicion
 			static void mainThread(DeviceMeasuring &deviceMeasuring);
 
-			//funcion que devulave un sector aleatorio
-			static void getRandonSector(InfoRead &infoRead,DeviceMeasuring &deviceMeasuring);
+			//funcion que devuelave un sector aleatorio
+			static void getRandomSector(InfoRead &infoRead,DeviceMeasuring &deviceMeasuring);
 			//funcion que devuelve un sector secuencial
 			static void getSequentialSector(InfoRead &infoRead,DeviceMeasuring &deviceMeasuring);
 

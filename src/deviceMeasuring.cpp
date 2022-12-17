@@ -60,13 +60,8 @@ void DeviceMeasuring::mainThread(DeviceMeasuring &deviceMeasuring){
 	std::clog<<"[DeviceMeasuring: '"<<name<<"' ] finalizando hilo"<<std::endl;
 }
 
-void DeviceMeasuring::getRandonSector(InfoRead &infoRead,DeviceMeasuring &deviceMeasuring){
-	unsigned long long out=0;
-	for(int cont=0;cont<4&&out<deviceMeasuring.numberSectors;cont++){
-		out|=std::rand();
-		out<<=16;
-	}
-	infoRead.sector=deviceMeasuring.numberSectors?out%deviceMeasuring.numberSectors:0;
+void DeviceMeasuring::getRandomSector(InfoRead &infoRead,DeviceMeasuring &deviceMeasuring){
+	infoRead.sector=deviceMeasuring.numberSectors?deviceMeasuring.randomGen.next(deviceMeasuring.numberSectors):0;
 	infoRead.sizeBlock=1;
 }
 
@@ -183,7 +178,7 @@ void DeviceMeasuring::setMode(const DeviceMeasuring::mode mode){
 	std::clog<<"[DeviceMeasuring: '"<<this->deviceInfo->get()<<"' ] modificando modo: "<<mode<<std::endl;
 	switch(mode){
 		case DeviceMeasuring::mode::random:
-			this->getSectorPtr.store((void*)DeviceMeasuring::getRandonSector);
+			this->getSectorPtr.store((void*)DeviceMeasuring::getRandomSector);
 			break;
 		case DeviceMeasuring::mode::sequential:
 			this->getSectorPtr.store((void*)DeviceMeasuring::getSequentialSector);

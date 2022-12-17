@@ -2,7 +2,7 @@
 
 CXX=g++
 CXXFLAGS=-O3 -std=c++17 -Wall
-LDFLAGS=-static
+LDFLAGS=-static -mwindows
 
 DIRSRC = src
 DIROBJ = obj
