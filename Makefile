@@ -1,6 +1,7 @@
 ## VARIABLES
 
 CXX=g++
+WINDRES=windres
 CXXFLAGS=-O3 -std=c++17 -Wall
 LDFLAGS=-static -mwindows
 
@@ -8,6 +9,7 @@ DIRSRC = src
 DIROBJ = obj
 DIRBIN = bin
 DIRDEP = dep
+DIRRES = res
 
 PROGRAM=VelocidadHDD
 LDLIBS=-lGdi32 -lcomctl32 -lAdvapi32
@@ -53,6 +55,14 @@ $(info OBJS = $(OBJS))
 DEPS = $(SRCS:$(DIRSRC)/%.cpp=$(DIRDEP)/%.d)
 $(info DEPS = $(DEPS))
 
+#listamos los archivos de recursos
+RESS = $(wildcard $(DIRRES)/*.rc)
+$(info RESS = $(RESS))
+
+#optenemos los archivos de recursos compilados
+RESSC = $(RESS:$(DIRRES)/%.rc=$(DIROBJ)/%.res)
+$(info RESSC = $(RESSC))
+
 ## TARGETS
 
 #targets que no son archivos
@@ -62,7 +72,7 @@ $(info DEPS = $(DEPS))
 all: $(FILE_BIN)
 
 #archivos a linkar
-$(FILE_BIN): $(OBJS)
+$(FILE_BIN): $(OBJS) $(RESSC)
 	$(CXX) $^ -o $@ $(LDLIBS) $(LDFLAGS)
 
 #incluimos las dependencias
@@ -76,7 +86,13 @@ $(DIROBJ)/%.o: $(DIRSRC)/%.cpp
 #	creamos los subdirectorios y compilamos los objetos
 	$(call MKDIR_OS,$(@D))
 	$(CXX) -o $@ -c $< $(CXXFLAGS) -I$(DIRSRC)
+	
+#patron de recursos a compilar
+$(DIROBJ)/%.res: $(DIRRES)/%.rc
+#	creamos los subdirectorios y compilamos los objetos
+	$(call MKDIR_OS,$(@D))
+	$(WINDRES) $< -O coff -o $@
 
 #limpiamos los archivos antiguos
 clean:
-	$(call RM_OS,$(DIROBJ) $(DIRDEP) $(FILE_BIN))
+	$(call RM_OS,$(DIROBJ) $(DIRDEP) $(FILE_BIN) $(RESSC))
